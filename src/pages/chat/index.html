@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ru" class="page">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NEON-CHAT | Чат</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./style.scss" />
+  </head>
+  <body class="page chat-page">
+    <div class="chat-container">
+      <!-- Блок списка чатов -->
+      <div class="chat-list">
+        <div class="chat-list-header">
+          <h2>Чаты</h2>
+          <button class="new-chat-button">{{> icon name="plus"}}</button>
+        </div>
+
+        <div class="chat-items">
+          <!-- {{#each chats}}
+          {{> chatItem
+            active=(eq this.id activeChatId)
+            avatar=this.avatar
+            name=Петя
+            preview=this.preview
+            time=this.time
+            id=this.id
+          }}
+        {{/each}} -->
+          {{> chatItem active=true avatar=this.avatar name='Петя' preview='Мы
+          только начали а я уже зае..ся' time="01:30" id=123 }}
+        </div>
+      </div>
+
+      <!-- Блок переписки -->
+      <div class="chat-conversation">
+        {{> conversationHeader avatar=activeChat.avatar name="Петя" status=
+        "online" }}
+
+        <div class="messages-container">
+          {{> message type= "received" content="Привет! Как продвигается
+          проект?" time="12:30" }} {{> message type= "sent" content="Мы
+          только начали а я уже зае..ся" time="12:30" }} {{#if true}}
+          <div class="message-date">{{"19 июля"}}</div>
+          {{else}} {{/if}}
+        </div>
+
+        {{> messageInput}}
+      </div>
+    </div>
+    <script type="module" src="../../main.js"></script>
+    <script src="/scripts/chat.js"></script>
+    <script src="/scripts/handlebars-helpers.js"></script>
+  </body>
+</html>

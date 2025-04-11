@@ -1,0 +1,112 @@
+@use '../../pages/utils.scss' as *;
+
+.conversation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: rgba($color-darker-bg, 0.9);
+  border-bottom: 1px solid rgba($color-neon-blue, 0.2);
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg,
+      transparent,
+      $color-neon-blue,
+      transparent);
+    opacity: 0.3;
+  }
+}
+
+.chat-partner {
+  display: flex;
+  align-items: center;
+
+  &-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 1rem;
+    border: 1px solid $color-neon-blue;
+    box-shadow: 0 0 10px rgba($color-neon-blue, 0.3);
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &-info {
+    .partner-name {
+      font-weight: 700;
+      color: white;
+      margin-bottom: 0.1rem;
+      font-size: 1.1rem;
+    }
+
+    .partner-status {
+      font-size: 0.8rem;
+
+      &.online {
+        color: $color-success;
+        position: relative;
+        padding-left: 15px;
+
+        &::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 10px;
+          height: 10px;
+          background: $color-success;
+          border-radius: 50%;
+          animation: pulse 2s infinite;
+        }
+      }
+
+      &.offline {
+        color: rgba(white, 0.5);
+      }
+    }
+  }
+}
+
+.chat-settings {
+  background: none;
+  border: none;
+  color: rgba(white, 0.6);
+  cursor: pointer;
+  transition: all 0.3s;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+
+  &:hover {
+    color: $color-neon-blue;
+    background: rgba($color-neon-blue, 0.1);
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}

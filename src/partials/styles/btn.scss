@@ -1,0 +1,99 @@
+// Переменные
+$neon-purple: #9d00ff;
+$neon-pink: #ff2a6d;
+$neon-blue: #0ff0fc;
+$glow-intensity: 0.5;
+
+// Базовые стили
+.btn {
+  position: relative;
+  width: 100%;
+  padding: 15px 25px;
+  background: linear-gradient(135deg, $neon-purple, $neon-pink);
+  border: none;
+  border-radius: 3px;
+  color: white;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow:
+    0 0 15px rgba($neon-purple, $glow-intensity),
+    0 0 5px rgba(white, 0.1) inset;
+
+  // Эффект свечения при наведении
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 0 20px rgba($neon-purple, $glow-intensity + 0.3),
+      0 0 30px rgba($neon-pink, $glow-intensity),
+      0 0 5px rgba(white, 0.2) inset;
+    text-shadow: 0 0 5px white;
+  }
+
+  // Активное состояние
+  &:active {
+    transform: translateY(1px);
+  }
+
+  // Иконка внутри кнопки
+  &__icon {
+    margin-left: 10px;
+    display: inline-block;
+    transition: transform 0.3s;
+  }
+
+  // Модификатор для пульсации
+  &--pulse {
+    animation: pulse 2s infinite;
+
+    &:hover {
+      animation: pulse 1s infinite;
+    }
+  }
+
+  // Модификатор для disabled состояния
+  &[disabled] {
+    background: gray;
+    box-shadow: none;
+    cursor: not-allowed;
+    animation: none;
+
+    &:hover {
+      transform: none;
+      box-shadow: none;
+    }
+  }
+
+  // Эффект "неонового свечения" вокруг кнопки
+  &::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 5px;
+    background: linear-gradient(135deg, $neon-purple, $neon-pink, $neon-blue);
+    background-size: 200% 200%;
+    z-index: -1;
+    opacity: 0.7;
+    animation: gradientShift 3s ease infinite;
+  }
+}
+
+// Анимации
+@keyframes pulse {
+  0% { opacity: 0.9; }
+  50% { opacity: 1; box-shadow: 0 0 25px rgba($neon-purple, $glow-intensity + 0.2); }
+  100% { opacity: 0.9; }
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
