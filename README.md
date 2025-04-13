@@ -21,3 +21,5 @@ git clone https://github.com/your-username/neon-chat.git
 
 Запустите dev-сервер:
 npm run dev
+ 
+[Netlify](https://effervescent-trifle-36f23b.netlify.app/)
