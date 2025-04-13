@@ -6,7 +6,7 @@
       href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./style.scss">
+    <link rel="stylesheet" href="./style.scss" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
@@ -21,7 +21,8 @@
               <div class="avatar-overlay">{{> icon name="edit"}}</div>
               <input
                 type="file"
-                id="avatarUpload"
+                id="avatar"
+                name="avatar"
                 accept="image/*"
                 class="avatar-formformInputGroupGroup"
               />
@@ -30,16 +31,14 @@
         </div>
 
         <form class="profile-form" id="profileForm">
+          {{> formInputGroup id="login" label="ЛОГИН" type="text" name="login"
+          value=user.login required=true }} {{> formInputGroup id="firstName"
+          label="ИМЯ" type="text" name="first_name" value=user.firstName }} {{>
+          formInputGroup id="displayName" label="ИМЯ В ЧАТЕ" type="text"
+          name="display_name" value=user.displayName }} {{> formInputGroup
+          id="phone" label="ТЕЛЕФОН" type="tel" name="phone" value=user.phone }}
           {{> formInputGroup id="email" label="E-MAIL" type="email" name="email"
-          value=user.email required=true }} {{> formInputGroup id="login"
-          label="ЛОГИН" type="text" name="login" value=user.login required=true
-          }} {{> formInputGroup id="firstName" label="ИМЯ" type="text"
-          name="first_name" value=user.firstName }} {{> formInputGroup
-          id="lastName" label="ФАМИЛИЯ" type="text" name="last_name"
-          value=user.lastName }} {{> formInputGroup id="displayName" label="ИМЯ
-          В ЧАТЕ" type="text" name="display_name" value=user.displayName }} {{>
-          formInputGroup id="phone" label="ТЕЛЕФОН" type="tel" name="phone"
-          value=user.phone }}
+          value=user.email required=true }}
 
           <div class="form-actions">
             {{> btn text="СОХРАНИТЬ" type="submit" pulse=true }}

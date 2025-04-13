@@ -22,16 +22,19 @@
 
         <form class="form form--neon" id="regForm">
           <h1 class="form__title form__title--glitch">NEON-CHAT v3.1.2</h1>
-          {{> formInputGroup id="username" label="Имя пользователя" type="text"
-          name="username" required=true placeholder=" Введите ваш никнейм" }}
-          {{> formInputGroup id="username" label="Фамилия пользователя" type="text"
-          name="username" required=true placeholder=" Введите вашу Фамилию" }}
-          {{> formInputGroup id="username" label="Имя пользователя" type="text"
-          name="username" required=true placeholder=" Введите ваш никнейм" }}
-          {{> formInputGroup id="username" label="Имя пользователя" type="text"
-          name="username" required=true placeholder=" Введите ваш никнейм" }}
-          {{> formInputGroup id="username" label="Имя пользователя" type="text"
-          name="username" required=true placeholder=" Введите ваш никнейм" }}
+          {{> formInputGroup id="login" label="login" type="text"
+          name="display_name" required=true placeholder=" Введите ваш login" }}
+          {{> formInputGroup id="first_name" label="Имя пользователя" type="text"
+          name="first_name" required=true placeholder=" Введите ваше имя" }}
+          {{> formInputGroup id="second_name" label="Имя пользователя" type="text"
+          name="second_name" required=true placeholder=" Введите ваше отчество" }}
+          {{> formInputGroup id="email" label="email" type="text"
+          name="email" required=true placeholder=" Введите вашу почту" }}
+          {{> formInputGroup id="password" label="Пароль" type="text"
+          name="password" required=true placeholder="Придумайте пароль" }}
+          {{> formInputGroup id="phone" label="Телефон" type="phone"
+          name="phone" required=true placeholder="Ваш номер" }}
+
           {{> btn type="submit" text="reg" }}
           <p class="terms">
             Нажимая кнопку, вы соглашаетесь с
