@@ -1,0 +1,20 @@
+{
+  "name": "easy-bundler",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "sass-embedded": "^1.86.3",
+    "vite": "^6.2.0"
+  },
+  "dependencies": {
+    "lodash-es": "^4.17.21",
+    "normalize.css": "^8.0.1",
+    "vite-plugin-handlebars": "^2.0.0"
+  }
+}

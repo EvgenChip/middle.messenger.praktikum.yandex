@@ -1,0 +1,121 @@
+@use '../utils' as *;
+
+.login-page {
+
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background:
+    radial-gradient(
+      circle at 20% 30%,
+      rgba($color-neon-purple, 0.1) 0%,
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 80% 70%,
+      rgba($color-neon-pink, 0.1) 0%,
+      transparent 30%
+    ),
+    $color-dark-bg;
+
+  .login-container {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    padding: 2.5rem;
+    background: rgba($color-darker-bg, 0.9);
+    border-radius: $border-radius;
+    box-shadow:
+      0 0 25px rgba($color-neon-blue, 0.2),
+      inset 0 0 15px rgba($color-neon-blue, 0.1);
+    border: 1px solid rgba($color-neon-blue, 0.2);
+    overflow: hidden;
+    z-index: 1;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        to bottom right,
+        transparent 45%,
+        $color-neon-blue 50%,
+        transparent 55%
+      );
+      opacity: 0.1;
+      transform: rotate(30deg);
+      animation: shine 6s linear infinite;
+      z-index: -1;
+    }
+  }
+
+  .login-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .login-title {
+    font-family: $font-heading;
+    color: $color-neon-blue;
+    font-size: 1.8rem;
+    letter-spacing: 3px;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 8px rgba($color-neon-blue, 0.5);
+    @include glitch-effect($color-neon-blue, $color-neon-pink, $color-neon-purple);
+  }
+
+  .login-subtitle {
+    color: rgba($color-neon-blue, 0.7);
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .form-actions {
+    margin-top: 1rem;
+  }
+
+  .login-links {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1.5rem;
+    font-size: 0.85rem;
+  }
+
+  .login-social {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba($color-neon-blue, 0.1);
+    text-align: center;
+
+    .social-title {
+      color: rgba(white, 0.6);
+      margin-bottom: 1rem;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .social-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+    }
+  }
+
+  @keyframes shine {
+    0% { transform: rotate(30deg) translate(-30%, -30%); }
+    100% { transform: rotate(30deg) translate(30%, 30%); }
+  }
+}

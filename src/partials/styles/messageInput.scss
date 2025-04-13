@@ -1,0 +1,69 @@
+@use '../../pages/utils.scss' as *;
+
+.message-input {
+  display: flex;
+  padding: 1rem;
+  background: rgba($color-darker-bg, 0.9);
+  border-top: 1px solid rgba($color-neon-blue, 0.2);
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg,
+      transparent,
+      $color-neon-blue,
+      transparent);
+    opacity: 0.2;
+  }
+
+  input {
+    flex: 1;
+    padding: 0.8rem 1.2rem;
+    background: rgba(black, 0.4);
+    border: 1px solid rgba($color-neon-blue, 0.3);
+    border-radius: $border-radius;
+    color: white;
+    font-family: $font-main;
+    transition: all 0.3s;
+    font-size: 0.95rem;
+
+    &::placeholder {
+      color: rgba(white, 0.4);
+    }
+
+    &:focus {
+      outline: none;
+      border-color: $color-neon-blue;
+      box-shadow: 0 0 15px rgba($color-neon-blue, 0.2);
+    }
+  }
+
+  button {
+    margin-left: 0.8rem;
+    background: rgba($color-neon-blue, 0.2);
+    border: 1px solid $color-neon-blue;
+    border-radius: $border-radius;
+    color: $color-neon-blue;
+    padding: 0 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      background: rgba($color-neon-blue, 0.3);
+      box-shadow: 0 0 15px rgba($color-neon-blue, 0.2);
+    }
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}

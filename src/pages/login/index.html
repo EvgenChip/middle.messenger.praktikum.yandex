@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru" class="page">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEON-CHAT | Вход</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.scss">
+</head>
+<body class="page">
+  <div class="login-page">
+
+
+    <div class="login-container">
+      <div class="login-header">
+        <h1 class="login-title" data-text="NEON-CHAT v3.1.2">NEON-CHAT v3.1.2</h1>
+        <p class="login-subtitle">АВТОРИЗАЦИЯ В СИСТЕМЕ</p>
+      </div>
+
+      <form class="login-form" id="loginForm">
+        {{> formInputGroup
+          id="login"
+          label="ЛОГИН"
+          type="text"
+          name="login"
+          required=true
+          placeholder="> Введите ваш логин"
+          icon="user"
+        }}
+
+        {{> formInputGroup
+          id="password"
+          label="ПАРОЛЬ"
+          type="password"
+          name="password"
+          required=true
+          placeholder="> ********"
+          icon="lock"
+        }}
+
+        <div class="form-actions">
+          {{> btn
+            text="ВОЙТИ"
+            type="submit"
+            pulse=true
+            icon="login"
+          }}
+        </div>
+
+        <div class="login-links">
+          <a href="/password-recovery" class="neon-link">Забыли пароль?</a>
+          <a href="../registration/index.html" class="neon-link">Регистрация</a>
+        </div>
+      </form>
+
+      <div class="login-social">
+        <p class="social-title">ИЛИ ВОЙТИ ЧЕРЕЗ:</p>
+        <div class="social-buttons">
+          {{> btn
+            text=""
+            type="button"
+            variant="icon"
+            icon="google"
+            onClick="loginWithGoogle()"
+          }}
+          {{> btn
+            text=""
+            type="button"
+            variant="icon"
+            icon="github"
+            onClick="loginWithGithub()"
+          }}
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="../../main.js"></script>
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const login = document.getElementById('login').value;
+      const password = document.getElementById('password').value;
+
+      // Заглушка для демонстрации
+      if (login && password) {
+        alert(`Добро пожаловать, ${login}!`);
+        window.location.href = '../chat/index.html';
+      } else {
+        alert('Пожалуйста, заполните все поля!');
+      }
+    });
+
+    function loginWithGoogle() {
+      alert('Авторизация через Google');
+    }
+
+    function loginWithGithub() {
+      alert('Авторизация через GitHub');
+    }
+  </script>
+</body>
+</html>

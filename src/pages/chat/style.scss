@@ -1,0 +1,234 @@
+@use '../utils' as *;
+
+.chat-page {
+  @include scanline(rgba($color-neon-blue, 0.03));
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 20% 30%, rgba($color-neon-purple, 0.1) 0%, transparent 30%),
+    radial-gradient(circle at 80% 70%, rgba($color-neon-pink, 0.1) 0%, transparent 30%),
+    $color-dark-bg;
+  overflow: hidden;
+}
+
+/* Контейнер чата */
+.chat-container {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  height: 100vh;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: rgba($color-darker-bg, 0.95);
+  border: 1px solid rgba($color-neon-blue, 0.3);
+  box-shadow:
+    0 0 30px rgba($color-neon-blue, 0.2),
+    inset 0 0 20px rgba($color-neon-blue, 0.1);
+}
+
+/* Список чатов */
+.chat-list {
+  border-right: 1px solid rgba($color-neon-blue, 0.2);
+  overflow-y: auto;
+  @include custom-scrollbar($color-neon-blue);
+
+  &-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba($color-neon-blue, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h2 {
+      font-family: $font-heading;
+      color: $color-neon-blue;
+      letter-spacing: 1px;
+      margin: 0;
+      text-shadow: 0 0 8px rgba($color-neon-blue, 0.3);
+    }
+  }
+}
+
+/* Элемент чата */
+.chat-item {
+
+  display: flex;
+  padding: 1rem;
+  border-bottom: 1px solid rgba($color-neon-blue, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba($color-neon-blue, 0.05);
+  }
+
+  &.active {
+    background: rgba($color-neon-blue, 0.1);
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 3px;
+      background: $color-neon-blue;
+    }
+  }
+
+  &-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 1rem;
+    border: 2px solid rgba($color-neon-blue, 0.5);
+    box-shadow: 0 0 10px rgba($color-neon-blue, 0.2);
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &-info {
+    flex: 1;
+    overflow: hidden;
+  }
+
+  &-name {
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.25rem;
+    @include text-ellipsis;
+  }
+
+  &-preview {
+    font-size: 0.85rem;
+    color: rgba(white, 0.6);
+    @include text-ellipsis;
+  }
+
+  &-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-left: 0.5rem;
+  }
+
+  &-time {
+    font-size: 0.75rem;
+    color: rgba($color-neon-blue, 0.7);
+    margin-bottom: 0.5rem;
+  }
+
+  &-delete {
+    background: none;
+    border: none;
+    color: rgba($color-error, 0.5);
+    cursor: pointer;
+    transition: all 0.3s;
+
+    &:hover {
+      color: $color-error;
+      transform: scale(1.1);
+    }
+  }
+}
+
+/* Область переписки */
+.chat-conversation {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* Шапка переписки */
+.conversation-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba($color-neon-blue, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba($color-darker-bg, 0.8);
+
+  &-back {
+    display: none; // Скрыто на десктопе
+  }
+}
+
+/* Контейнер сообщений */
+.messages-container {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  @include custom-scrollbar($color-neon-purple);
+  background:
+    radial-gradient(circle at 50% 100%, rgba($color-neon-purple, 0.05) 0%, transparent 70%),
+    $color-darker-bg;
+}
+
+/* Блок ввода сообщения */
+.message-input {
+  padding: 1rem;
+  border-top: 1px solid rgba($color-neon-blue, 0.2);
+  display: flex;
+  background: rgba($color-darker-bg, 0.9);
+
+  input {
+    flex: 1;
+    padding: 0.8rem 1rem;
+    background: rgba(black, 0.3);
+    border: 1px solid rgba($color-neon-blue, 0.3);
+    border-radius: $border-radius;
+    color: white;
+    font-family: $font-main;
+    transition: all 0.3s;
+
+    &:focus {
+      outline: none;
+      border-color: $color-neon-blue;
+      box-shadow: 0 0 10px rgba($color-neon-blue, 0.3);
+    }
+  }
+
+  button {
+    margin-left: 0.5rem;
+    background: rgba($color-neon-blue, 0.2);
+    border: 1px solid $color-neon-blue;
+    border-radius: $border-radius;
+    color: $color-neon-blue;
+    padding: 0 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s;
+
+    &:hover {
+      background: rgba($color-neon-blue, 0.3);
+      box-shadow: 0 0 15px rgba($color-neon-blue, 0.2);
+    }
+  }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .chat-container {
+    grid-template-columns: 1fr;
+  }
+
+  .chat-list {
+    display: none;
+
+    &.mobile-visible {
+      display: block;
+    }
+  }
+
+  .conversation-header-back {
+    display: block;
+    margin-right: 1rem;
+    color: $color-neon-blue;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+}

@@ -1,0 +1,26 @@
+$neon-blue: #0ff0fc;
+$neon-pink: #ff2a6d;
+$dark-bg: rgba(10, 10, 20, 0.8);
+$error-color: #ff3860;
+
+.input-group {
+  position: relative;
+  margin-bottom: 1.5rem;
+  width: 100%;
+
+  &__label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: $neon-pink;
+    font-family: "Rajdhani", sans-serif;
+    font-weight: 700;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+  }
+
+  &__required {
+    color: $neon-pink;
+    margin-left: 0.2rem;
+  }
+}

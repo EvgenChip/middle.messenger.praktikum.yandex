@@ -1,0 +1,145 @@
+/* Базовые стили */
+@use "../utils" as *;
+body {
+  margin: 0;
+  background: #0a0a12;
+  color: #e0e0e0;
+  font-family: "Rajdhani", sans-serif;
+  overflow: hidden;
+}
+
+.error-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Анимация сканирующей линии */
+.scanline {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: rgba(0, 255, 255, 0.3);
+  animation: scan 3s linear infinite;
+  z-index: 10;
+}
+
+@keyframes scan {
+  0% {
+    top: 0;
+  }
+  100% {
+    top: 100%;
+  }
+}
+
+/* Стили для кота-хакера */
+.hacker-cat {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  font-family: monospace;
+  color: #0ff0fc;
+}
+
+.cat-terminal {
+  margin-top: 5px;
+  font-size: 14px;
+}
+
+.blink {
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Стили контента ошибки */
+.error-content {
+  text-align: center;
+  max-width: 600px;
+  padding: 2rem;
+}
+
+.error-code {
+  font-size: 5rem;
+  margin-bottom: 1rem;
+}
+
+.error-title {
+  font-family: "Orbitron", sans-serif;
+  color: #0ff0fc;
+  margin-bottom: 1.5rem;
+}
+
+.error-message p {
+  margin: 0.5rem 0;
+  font-size: 1.2rem;
+}
+
+.home-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+  padding: 0.8rem 1.5rem;
+  background: rgba(15, 240, 252, 0.1);
+  color: #0ff0fc;
+  border: 1px solid #0ff0fc;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: all 0.3s;
+}
+
+.home-button:hover {
+  background: rgba(15, 240, 252, 0.3);
+  box-shadow: 0 0 15px rgba(15, 240, 252, 0.5);
+}
+
+.error-terminal {
+  margin-top: 2rem;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(15, 240, 252, 0.2);
+  border-radius: 4px;
+  text-align: left;
+  font-family: monospace;
+}
+
+.terminal-line {
+  margin: 0.5rem 0;
+}
+.error-page {
+  // Оранжевые элементы на странице 404
+  .error-code .digit:nth-child(1) {
+    text-shadow: 0 0 10px rgba($color-neon-orange, 0.5);
+  }
+  /* Специфичные стили для 500 */
+  .error-500 {
+    .hacker-cat {
+      color: #ff2a6d;
+    }
+
+    .home-button:hover {
+      box-shadow: 0 0 20px rgba(255, 42, 109, 0.5);
+    }
+
+    .scanline {
+      background: rgba(255, 42, 109, 0.3);
+    }
+  }
+
+  .home-button {
+    &:hover {
+      background: rgba($color-neon-orange, 0.2);
+      border-color: $color-neon-orange;
+    }
+  }
+}
