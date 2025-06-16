@@ -1,0 +1,6 @@
+export const messageInputTemplate = `<div class="message-input">
+  <input name="message" type="text" placeholder="Введите сообщение...">
+  <button class="send-button">
+    {{> icon name="send"}}
+  </button>
+</div>`;

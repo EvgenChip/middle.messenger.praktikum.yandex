@@ -1,8 +1,4 @@
-{{!-- <button type="{{type}}" class="neon-button">
-  {{text}}
-</button> --}}
-
-
+export const buttonTemplate = `
 <button
   class="btn {{#if pulse}}btn--pulse{{/if}} {{class}}"
   type="{{type}}"
@@ -14,3 +10,4 @@
     <span class="btn__icon">{{{icon}}}</span>
   {{/if}}
 </button>
+`

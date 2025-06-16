@@ -1,4 +1,4 @@
-import ButtonTest from "../partials/buttonTest";
+import ButtonTest from "../../partials/buttonTest";
 
 export function render(query, block) {
   const root = document.querySelector(query);
@@ -13,5 +13,4 @@ export function render(query, block) {
 
 const but = new ButtonTest();
 
-return render(".app", but);
-console.log(render(".app", but));
+render("#app", but);

@@ -20,7 +20,7 @@
         </div>
 
         <div class="chat-items">
-          <!-- {{#each chats}}
+          {{#each chats}}
           {{> chatItem
             active=(eq this.id activeChatId)
             avatar=this.avatar
@@ -29,9 +29,9 @@
             time=this.time
             id=this.id
           }}
-        {{/each}} -->
-          {{> chatItem active=true avatar=this.avatar name='Петя' preview='Мы
-          только начали а я уже зае..ся' time="01:30" id=123 }}
+        {{/each}}
+          <!-- {{> chatItem active=true avatar=this.avatar name='Петя' preview='Мы
+          только начали а я уже зае..ся' time="01:30" id=123 }} -->
         </div>
       </div>
 
