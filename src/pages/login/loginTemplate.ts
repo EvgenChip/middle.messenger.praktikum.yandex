@@ -6,11 +6,28 @@ export const loginTemplate = `<div class="login-page">
     </div>
 
     <form class="login-form" id="loginForm">
-      {{{loginInput}}}
-      {{{passwordInput}}}
+      {{> formInputGroup
+        id="login"
+        label="ЛОГИН"
+        type="text"
+        name="login"
+        required=true
+        placeholder="> Введите ваш логин"
+        icon="user"
+      }}
+
+      {{> formInputGroup
+        id="password"
+        label="ПАРОЛЬ"
+        type="password"
+        name="password"
+        required=true
+        placeholder="> ********"
+        icon="lock"
+      }}
 
       <div class="form-actions">
-        {{{submitButton}}}
+        {{> btn text="ВОЙТИ" type="submit" pulse=true icon="login" }}
       </div>
 
       <div class="login-links">
@@ -22,8 +39,8 @@ export const loginTemplate = `<div class="login-page">
     <div class="login-social">
       <p class="social-title">ИЛИ ВОЙТИ ЧЕРЕЗ:</p>
       <div class="social-buttons">
-        {{{googleButton}}}
-        {{{githubButton}}}
+        {{> btn text="" type="button" icon="google" onClick="loginWithGoogle()" }}
+        {{> btn text="" type="button" icon="github" onClick="loginWithGithub()" }}
       </div>
     </div>
   </div>

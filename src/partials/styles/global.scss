@@ -1,0 +1,37 @@
+@use '../../pages/utils.scss' as *;
+
+// Глобальные стили для скролла
+html, body {
+  height: 100%;
+  overflow-x: hidden;
+}
+
+body.page {
+  overflow-y: auto;
+  height: auto;
+  min-height: 100vh;
+}
+
+// Обеспечиваем скролл для главного контейнера
+#app {
+  min-height: 100vh;
+  height: auto;
+}
+
+// Стили для скроллбара
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba($color-darker-bg, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba($color-neon-blue, 0.5);
+  border-radius: 4px;
+
+  &:hover {
+    background: rgba($color-neon-blue, 0.8);
+  }
+}

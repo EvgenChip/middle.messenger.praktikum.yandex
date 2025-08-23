@@ -13,13 +13,15 @@ type EventBusType = {
 };
 
 interface BlockProps {
-  [key: string]: Block | object | (() => void) | string | undefined;
+  [key: string]: Block | object | (() => void) | string | boolean | undefined;
   _id: string | undefined;
 }
 
 interface ParsedProps {
   children: { [key: string]: Block };
-  props: { [key: string]: string | boolean | void | object };
+  props: {
+    [key: string]: string | boolean | number | void | object | (() => void);
+  };
   lists: { [key: string]: Block[] };
   _id?: string;
 }
@@ -29,6 +31,7 @@ interface AnyProps {
     | Block
     | boolean
     | string
+    | number
     | []
     | object
     | Block[]
@@ -84,7 +87,7 @@ class Block {
         } else if (Array.isArray(anyProps[key])) {
           lists[key] = anyProps[key].filter((item) => item instanceof Block);
         } else {
-          props[key] = anyProps[key];
+          props[key] = anyProps[key] as any;
         }
       });
     }
@@ -227,7 +230,7 @@ class Block {
   }
 
   getContent() {
-    console.log('ELEM',this?._element)
+    console.log("ELEM", this?._element);
     return this?._element;
   }
 
@@ -248,7 +251,6 @@ class Block {
   }
 
   private _createDocumentElement(tagName: string): HTMLElement {
-    console.log("tagname", tagName);
     return document.createElement(tagName);
   }
 

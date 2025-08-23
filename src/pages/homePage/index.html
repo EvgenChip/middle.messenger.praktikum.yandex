@@ -9,90 +9,9 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./style.scss" />
-    <symbol id="icon-message" viewBox="0 0 24 24">
-        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
-      </symbol>
   </head>
   <body class="page">
-    <div class="home-page">
-      <main class="home-container">
-        <div class="home-header">
-          <h1 class="home-title" data-text="NEON-CHAT v3.1.2">
-            NEON-CHAT v3.1.2
-          </h1>
-          <p class="home-subtitle">ДОБРО ПОЖАЛОВАТЬ В КИБЕРПРОСТРАНСТВО</p>
-        </div>
-
-        <div class="home-content">
-          <div class="terminal-window">
-            <div class="terminal-header">
-              <div class="terminal-buttons">
-                <span class="terminal-btn terminal-btn--red"></span>
-                <span class="terminal-btn terminal-btn--yellow"></span>
-                <span class="terminal-btn terminal-btn--green"></span>
-              </div>
-
-              <span class="terminal-title>system_terminal"></span>
-            </div>
-            <div class="terminal-body">
-              <p class="terminal-line">> <span class="blink">_</span></p>
-              <p class="terminal-line">> Инициализация системы...</p>
-              <p class="terminal-line">
-                > Статус: <span class="text-success">ONLINE</span>
-              </p>
-              <p class="terminal-line">
-                > Введите <span class="text-command">help</span> для списка
-                команд
-              </p>
-            </div>
-          </div>
-
-          <div class="home-links">
-            {{> linkCard title="Вход в систему" description="Авторизация
-            пользователя" icon="login" url="../login/index.html" accent="blue" }} {{>
-            linkCard title="Регистрация" description="Создание нового аккаунта"
-            icon="user-add" url="../registration/index.html" accent="pink" }} {{> linkCard
-            title="Профиль" description="Управление данными" icon="profile"
-            url="../profile/" accent="purple" }}
-            {{> linkCard
-                title="Тест 404"
-                description="Демо страницы ошибки"
-                icon="bug"
-                url="../errorsPage/404.html"
-                accent="orange"
-              }}
-              {{> linkCard
-                title="Тест 500"
-                description="Демо ошибки сервера"
-                icon="server"
-                url="../errorsPage/500.html"
-                accent="red"
-              }}
-              {{> linkCard
-                title="Чат"
-                description="Перейти к перепискам"
-                icon="message"
-                url="../chat/index.html"
-                accent="green"
-              }}
-          </div>
-        </div>
-
-        <footer class="home-footer">
-          <p class="copyright">NEON-CHAT © 2133 | Все права лишены</p>
-
-        </footer>
-      </main>
-    </div>
-
-    <script>
-      // Анимация мигающего курсора
-      const blink = document.querySelector(".blink");
-      setInterval(
-        () => (blink.style.opacity = blink.style.opacity === "0" ? "1" : "0"),
-        500
-      );
-    </script>
+    <div id="app"></div>
     <script type="module" src="../../main.js"></script>
   </body>
 </html>

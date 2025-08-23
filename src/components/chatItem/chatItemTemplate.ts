@@ -1,6 +1,9 @@
-export const chatItemTemplate = `<div class="chat-item {{#if active}}active{{/if}}" data-chat-id="{{id}}">
+export const chatItemTemplate = `
   <div class="chat-avatar">
     <img src="{{avatar}}" alt="{{name}}">
+    {{#if unreadCount}}
+      <div class="unread-badge">{{unreadCount}}</div>
+    {{/if}}
   </div>
   <div class="chat-info">
     <div class="chat-name">{{name}}</div>
@@ -12,4 +15,4 @@ export const chatItemTemplate = `<div class="chat-item {{#if active}}active{{/if
       {{> icon name="trash"}}
     </button>
   </div>
-</div>`
+`;

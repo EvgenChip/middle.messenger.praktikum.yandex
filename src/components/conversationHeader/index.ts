@@ -14,7 +14,11 @@ class ConversationHeader extends Block {
     super("div", {
       ...props,
       events: {
-        click: props.onSettingsClick || (() => {}),
+        click: (e: Event) => {
+          if ((e.target as HTMLElement).closest(".chat-settings")) {
+            props.onSettingsClick?.(e);
+          }
+        },
       },
     });
   }

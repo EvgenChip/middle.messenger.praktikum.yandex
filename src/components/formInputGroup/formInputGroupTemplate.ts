@@ -4,8 +4,18 @@ export const formInputGroupTemplate = `<div class="input-group {{#if error}}inpu
     {{#if required}}<span class="input-group__required">*</span>{{/if}}
   </label>
 
- {{> formInput
-    }}
+  {{> formInput
+    type=type
+    id=id
+    name=name
+    placeholder=placeholder
+    required=required
+    value=value
+  }}
 
-
+  {{#if icon}}
+    <div class="input-group__icon">
+      {{> icon name=icon}}
+    </div>
+  {{/if}}
 </div>`;

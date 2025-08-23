@@ -1,4 +1,4 @@
-export const messageTemplate = `<div class="message {{type}}">
+export const messageTemplate = `<div class="message message--{{type}}">
   <div class="message-content">
     {{content}}
   </div>

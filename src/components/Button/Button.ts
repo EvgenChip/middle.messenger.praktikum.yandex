@@ -1,4 +1,3 @@
-import { Handlebars } from "handlebars";
 import Block from "../../services/Block";
 import { buttonTemplate } from "./buttonTemplate";
 

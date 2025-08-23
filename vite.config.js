@@ -4,16 +4,17 @@ import { resolve } from "path";
 
 export default defineConfig({
   root: resolve(__dirname, "src"),
-  build: { outDir: resolve(__dirname, "dist") },
-  rollupOptions: {
-    input: {
-      main: resolve(__dirname, "/pages/homePage/index.html"), // Стартовая страница
+  build: {
+    outDir: resolve(__dirname, "dist"),
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, "src/index.html"), // Главная точка входа
+      },
     },
   },
   plugins: [
     handlebars({
       partialDirectory: resolve(__dirname, "./src/partials"),
-
       context: {
         username: "Evgen",
       },
@@ -21,7 +22,7 @@ export default defineConfig({
   ],
   server: {
     port: 3000,
-    open: "/pages/homePage/index.html",
+    open: "/",
     host: true,
   },
   assetsInclude: ["**/*.html"],

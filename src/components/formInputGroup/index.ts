@@ -1,5 +1,4 @@
 import Block from "../../services/Block";
-import FormInput from "../formInput";
 import Handlebars from "handlebars";
 import { formInputGroupTemplate } from "./formInputGroupTemplate";
 import { formInputTemplate } from "../formInput/fornInputTemplate";
@@ -14,6 +13,7 @@ interface FormInputGroupProps {
   required?: boolean;
   error?: boolean;
   value?: string;
+  icon?: string;
   onInput?: (event: Event) => void;
   onChange?: (event: Event) => void;
 }
@@ -34,7 +34,7 @@ class FormInputGroup extends Block {
   }
 
   get inputElement(): HTMLInputElement | null {
-    return this.element.querySelector('input');
+    return this.element.querySelector("input");
   }
 
   getValue(): string {

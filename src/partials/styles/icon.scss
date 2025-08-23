@@ -34,4 +34,56 @@ $transition-duration: 0.3s;
   &--close {
     color: $color-error;
   }
+
+  &--plus {
+    color: $color-neon-blue;
+  }
+
+  &--trash {
+    color: $color-error;
+  }
+
+  &--settings {
+    color: $color-neon-blue;
+  }
+
+  &--send {
+    color: $color-neon-blue;
+  }
+
+  &--user {
+    color: $color-neon-purple;
+  }
+
+  &--login {
+    color: $color-neon-blue;
+  }
+
+  &--google {
+    color: #4285f4;
+  }
+
+  &--github {
+    color: #333;
+  }
+
+  &--user-add {
+    color: $color-success;
+  }
+
+  &--profile {
+    color: $color-neon-purple;
+  }
+
+  &--bug {
+    color: $color-error;
+  }
+
+  &--server {
+    color: $color-neon-pink;
+  }
+
+  &--message {
+    color: $color-neon-blue;
+  }
 }

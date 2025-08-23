@@ -2,7 +2,7 @@ import Block from "../../services/Block";
 import { messageTemplate } from "./messageTemplate";
 
 interface MessageProps {
-  type: string;
+  type: "sent" | "received";
   content: string;
   time: string;
 }
