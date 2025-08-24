@@ -23,8 +23,4 @@ dist-ssr
 *.sln
 *.sw?
 
-# Cursor IDE
-.cursor/
-.cursorrules
-.cursor-settings/
-.cursor-extensions/
+
