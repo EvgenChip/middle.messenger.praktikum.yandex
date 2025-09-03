@@ -11,48 +11,7 @@
     <link rel="stylesheet" href="./style.scss" />
   </head>
   <body class="page chat-page">
-    <div class="chat-container">
-      <!-- Блок списка чатов -->
-      <div class="chat-list">
-        <div class="chat-list-header">
-          <h2>Чаты</h2>
-          <button class="new-chat-button">{{> icon name="plus"}}</button>
-        </div>
-
-        <div class="chat-items">
-          <!-- {{#each chats}}
-          {{> chatItem
-            active=(eq this.id activeChatId)
-            avatar=this.avatar
-            name=Петя
-            preview=this.preview
-            time=this.time
-            id=this.id
-          }}
-        {{/each}} -->
-          {{> chatItem active=true avatar=this.avatar name='Петя' preview='Мы
-          только начали а я уже зае..ся' time="01:30" id=123 }}
-        </div>
-      </div>
-
-      <!-- Блок переписки -->
-      <div class="chat-conversation">
-        {{> conversationHeader avatar=activeChat.avatar name="Петя" status=
-        "online" }}
-
-        <div class="messages-container">
-          {{> message type= "received" content="Привет! Как продвигается
-          проект?" time="12:30" }} {{> message type= "sent" content="Мы
-          только начали а я уже зае..ся" time="12:30" }} {{#if true}}
-          <div class="message-date">{{"19 июля"}}</div>
-          {{else}} {{/if}}
-        </div>
-
-        {{> messageInput}}
-      </div>
-    </div>
+    <div id="app"></div>
     <script type="module" src="../../main.js"></script>
-    <script src="/scripts/chat.js"></script>
-    <script src="/scripts/handlebars-helpers.js"></script>
   </body>
 </html>

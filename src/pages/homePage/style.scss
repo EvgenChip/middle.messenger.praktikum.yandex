@@ -1,12 +1,21 @@
 @use '../utils' as *;
 
+body.page {
+  overflow-y: auto;
+  height: auto;
+}
+
 .home-page {
   @include scanline(rgba($color-neon-blue, 0.03));
   min-height: 100vh;
+  height: auto;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   padding: 2rem;
+  padding-top: 2rem;
+  padding-bottom: 4rem;
+  overflow-y: auto;
   background:
     radial-gradient(
       circle at 20% 30%,
@@ -31,7 +40,7 @@
       0 0 25px rgba($color-neon-blue, 0.2),
       inset 0 0 15px rgba($color-neon-blue, 0.1);
     border: 1px solid rgba($color-neon-blue, 0.2);
-    overflow: hidden;
+    overflow: visible;
     z-index: 1;
   }
 
