@@ -32,7 +32,7 @@ export const loginTemplate = `<div class="login-page">
 
       <div class="login-links">
         <a href="/password-recovery" class="neon-link">Забыли пароль?</a>
-        <a href="/registration" class="neon-link">Регистрация</a>
+        <a href="/sign-up" class="neon-link">Регистрация</a>
       </div>
     </form>
 

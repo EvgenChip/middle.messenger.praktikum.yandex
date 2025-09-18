@@ -24,22 +24,6 @@ export class Router {
     this.routes = [
       {
         path: "/",
-        component: HomePage,
-        props: {
-          title: "NEON-CHAT v3.1.2",
-          subtitle: "ДОБРО ПОЖАЛОВАТЬ В КИБЕРПРОСТРАНСТВО",
-        },
-      },
-      {
-        path: "/home",
-        component: HomePage,
-        props: {
-          title: "NEON-CHAT v3.1.2",
-          subtitle: "ДОБРО ПОЖАЛОВАТЬ В КИБЕРПРОСТРАНСТВО",
-        },
-      },
-      {
-        path: "/login",
         component: LoginPage,
         props: {
           title: "NEON-CHAT v3.1.2",
@@ -47,7 +31,7 @@ export class Router {
         },
       },
       {
-        path: "/registration",
+        path: "/sign-up",
         component: RegistrationPage,
         props: {
           title: "NEON-CHAT v3.1.2",
@@ -55,7 +39,7 @@ export class Router {
         },
       },
       {
-        path: "/profile",
+        path: "/settings",
         component: ProfilePage,
         props: {
           title: "ПРОФИЛЬ",
@@ -71,9 +55,17 @@ export class Router {
         },
       },
       {
-        path: "/chat",
+        path: "/messenger",
         component: null, // Будет загружаться динамически
         props: {},
+      },
+      {
+        path: "/home",
+        component: HomePage,
+        props: {
+          title: "NEON-CHAT v3.1.2",
+          subtitle: "ДОБРО ПОЖАЛОВАТЬ В КИБЕРПРОСТРАНСТВО",
+        },
       },
       {
         path: "/404",
@@ -126,13 +118,29 @@ export class Router {
   }
 
   public navigate(path: string) {
-    // Обновляем URL без перезагрузки страницы
     window.history.pushState({}, "", path);
     this.handleRoute(path);
   }
 
   private async handleRoute(path: string) {
-    console.log("🔍 Navigating to:", path);
+    // Проверяем авторизацию для защищенных маршрутов
+    const protectedRoutes = ["/messenger", "/settings"];
+    const isProtected = protectedRoutes.some((route) => path.startsWith(route));
+    // Для этого API авторизация происходит через cookies, а не localStorage
+    const isAuthenticated =
+      document.cookie.includes("authCookie") ||
+      !!localStorage.getItem("authToken");
+
+    if (isProtected && !isAuthenticated) {
+      this.navigate("/");
+      return;
+    }
+
+    // Если пользователь авторизован и пытается зайти на логин/регистрацию, перенаправляем в чат
+    if (isAuthenticated && (path === "/" || path === "/sign-up")) {
+      this.navigate("/messenger");
+      return;
+    }
 
     // Ищем маршрут
     let route = this.routes.find((r) => r.path === path);
@@ -147,15 +155,14 @@ export class Router {
       route = this.routes.find((r) => r.path === "/404")!;
     }
 
-    // Специальная обработка для чата (динамический импорт)
-    if (path.includes("/chat")) {
+    // Специальная обработка для мессенджера (динамический импорт)
+    if (path.includes("/messenger")) {
       try {
         const { ChatPage } = await import("../pages/chat/ChatPage");
         const chatPage = new ChatPage();
         render("#app", chatPage);
         return;
       } catch (error) {
-        console.error("Error importing ChatPage:", error);
         // В случае ошибки показываем 500
         route = this.routes.find((r) => r.path === "/500")!;
       }

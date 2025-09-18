@@ -9,6 +9,8 @@ import { messageInputTemplate } from "../../components/messageInput/messageInput
 import { chatItemTemplate } from "../../components/chatItem/chatItemTemplate";
 import { iconTemplate } from "../../components/icon/iconTebplate";
 import { Validator } from "../../services/Validator";
+import { chatAPI } from "../../services/api";
+import { webSocketService, WSMessage } from "../../services/WebSocketService";
 
 // Регистрируем все необходимые partials
 Handlebars.registerPartial("conversationHeader", conversationHeaderTemplate);
@@ -29,7 +31,7 @@ interface Chat {
 
 interface ChatMessage {
   id: string;
-  type: 'sent' | 'received';
+  type: "sent" | "received";
   content: string;
   time: string;
   chatId: string;
@@ -57,6 +59,7 @@ export class ChatPage extends Block {
       events: {
         click: (e: Event) => this.handleClick(e),
         submit: (e: Event) => this.handleSubmit(e),
+        keypress: (e: KeyboardEvent) => this.handleKeypress(e),
       },
     });
 
@@ -67,31 +70,151 @@ export class ChatPage extends Block {
   }
 
   componentDidMount() {
-    console.log("ChatPage componentDidMount called");
-    // Инициализация дочерних компонентов
-    this.initializeChatItems();
-    this.initializeMessageInput();
+    this.loadChatsFromAPI();
+  }
 
-    // Автоматически выбираем первый чат, если нет активного
-    if (!this.activeChatId && this.chats.length > 0) {
-      console.log("Auto-selecting first chat:", this.chats[0].name);
-      this.activeChatId = this.chats[0].id;
-      this.messages = this.getMockMessages(this.chats[0].id);
+  componentWillUnmount() {
+    // Отключаемся от WebSocket при выходе из чата
+    webSocketService.disconnect();
+  }
 
-      // Сначала обновляем разговор, затем рендерим
-      this.updateConversation();
-      console.log("Messages loaded:", this.messages);
+  private async loadChatsFromAPI() {
+    try {
+      const apiChats = await chatAPI.getChats();
+
+      this.chats = apiChats.map((chat) => ({
+        id: chat.id.toString(),
+        name: chat.title,
+        avatar: chat.avatar || "",
+        preview: chat.last_message?.content || "",
+        time: chat.last_message?.time || "",
+        unreadCount: chat.unread_count || 0,
+        status: "online",
+      }));
+
+      this.initializeChatItems();
+      this.initializeMessageInput();
+
+      if (!this.activeChatId && this.chats.length > 0) {
+        this.activeChatId = this.chats[0].id;
+        await this.loadMessagesForChat(this.activeChatId);
+      }
+
+      this.eventBus.emit(Block.EVENTS.FLOW_RENDER);
+    } catch (error) {
+      this.initializeChatItems();
+      this.initializeMessageInput();
+      this.eventBus.emit(Block.EVENTS.FLOW_RENDER);
     }
+  }
 
+  private async loadMessagesForChat(chatId: string) {
+    try {
+      const apiMessages = await chatAPI.getChatMessages(chatId);
+
+      this.messages = apiMessages.map((message) => ({
+        id: message.id,
+        type: message.user_id === this.getCurrentUserId() ? "sent" : "received",
+        content: message.content,
+        time: new Date(message.time).toLocaleTimeString("ru-RU", {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        chatId: chatId,
+      }));
+
+      this.updateConversation();
+    } catch (error) {
+      this.messages = this.getMockMessages(chatId);
+      this.updateConversation();
+    }
+  }
+
+  private async getCurrentUserId(): Promise<string> {
+    try {
+      const userData = await chatAPI.getCurrentUser();
+      return userData.id.toString();
+    } catch (error) {
+      return "unknown";
+    }
+  }
+
+  private async connectToWebSocket(chatId: string): Promise<void> {
+    try {
+      await webSocketService.connect({
+        chatId,
+        onMessage: (message) => this.handleWebSocketMessage(message),
+        onMessages: (messages) => this.handleWebSocketMessages(messages),
+        onConnect: () => ("✅ WebSocket connected to chat:", chatId),
+        onDisconnect: () => ("🔌 WebSocket disconnected from chat:", chatId),
+        onError: (error) => ("❌ WebSocket error:", error),
+      });
+    } catch (error) {
+      await this.loadMessagesForChat(chatId);
+    }
+  }
+
+  private escapeHtml(text: string): string {
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  /**
+   * Обработка нового сообщения из WebSocket
+   */
+  private async handleWebSocketMessage(wsMessage: WSMessage): Promise<void> {
+    const currentUserId = await this.getCurrentUserId();
+
+    const message: ChatMessage = {
+      id: wsMessage.id || Date.now().toString(),
+      type: wsMessage.user_id === currentUserId ? "sent" : "received",
+      content: this.escapeHtml(wsMessage.content),
+      time: wsMessage.time
+        ? new Date(wsMessage.time).toLocaleTimeString("ru-RU", {
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+        : new Date().toLocaleTimeString("ru-RU", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+      chatId: this.activeChatId || "",
+    };
+
+    this.messages.unshift(message);
+    this.updateConversation();
     this.eventBus.emit(Block.EVENTS.FLOW_RENDER);
   }
 
-  private initializeChatItems() {
-    console.log("Initializing chat items, chats:", this.chats);
-    // Не создаем отдельные компоненты ChatItem, так как они рендерятся через шаблон
-    // Просто сохраняем данные для рендеринга
-    console.log("Chat items data prepared for template rendering");
+  private async handleWebSocketMessages(
+    wsMessages: WSMessage[]
+  ): Promise<void> {
+    const currentUserId = await this.getCurrentUserId();
+
+    const messages: ChatMessage[] = wsMessages.map((wsMessage) => ({
+      id: wsMessage.id || Date.now().toString(),
+      type: wsMessage.user_id === currentUserId ? "sent" : "received",
+      content: this.escapeHtml(wsMessage.content),
+      time: wsMessage.time
+        ? new Date(wsMessage.time).toLocaleTimeString("ru-RU", {
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+        : new Date().toLocaleTimeString("ru-RU", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+      chatId: this.activeChatId || "",
+    }));
+
+    this.messages = messages;
+
+    this.updateConversation();
+    this.eventBus.emit(Block.EVENTS.FLOW_RENDER);
   }
+
+  private initializeChatItems() {}
 
   private initializeMessageInput() {
     this.children.messageInput = new MessageInput({
@@ -103,37 +226,53 @@ export class ChatPage extends Block {
 
   private handleClick(e: Event) {
     const target = e.target as HTMLElement;
-    console.log("Click event detected on:", target);
 
-    // Обработка клика по кнопке нового чата
-    if (target.closest('.new-chat-button')) {
-      console.log("New chat button clicked");
+    if (target.closest(".new-chat-button")) {
       this.handleNewChat();
       return;
     }
 
-    // Обработка клика по элементу чата
-    const chatItem = target.closest('.chat-item');
+    const chatItem = target.closest(".chat-item");
     if (chatItem) {
-      const chatId = chatItem.getAttribute('data-chat-id');
+      const chatId = chatItem.getAttribute("data-chat-id");
       if (chatId) {
-        console.log(`Chat item clicked, ID: ${chatId}`);
         this.handleChatSelect(chatId, e);
         return;
       }
     }
 
-    // Обработка клика по кнопке удаления чата
-    const deleteButton = target.closest('.delete-chat');
+    const deleteButton = target.closest(".delete-chat");
     if (deleteButton) {
-      const chatItem = deleteButton.closest('.chat-item');
+      const chatItem = deleteButton.closest(".chat-item");
       if (chatItem) {
-        const chatId = chatItem.getAttribute('data-chat-id');
+        const chatId = chatItem.getAttribute("data-chat-id");
         if (chatId) {
-          console.log(`Delete chat button clicked for chat: ${chatId}`);
+          `Delete chat button clicked for chat: ${chatId}`;
           this.handleChatDelete(chatId);
           return;
         }
+      }
+    }
+
+    // Обработка клика по кнопке закрытия модального окна
+    if (target.closest('[data-action="closeCreateChatModal"]')) {
+      this.closeCreateChatModal();
+      return;
+    }
+
+    // Обработка клика по фону модального окна
+    if (target.id === "createChatModal") {
+      this.closeCreateChatModal();
+      return;
+    }
+
+    if (target.classList.contains("send-button")) {
+      const messageInput = target.parentElement?.querySelector(
+        'input[name="message"]'
+      ) as HTMLInputElement;
+      if (messageInput && messageInput.value.trim()) {
+        this.handleMessageSend(messageInput.value.trim());
+        messageInput.value = "";
       }
     }
   }
@@ -142,128 +281,194 @@ export class ChatPage extends Block {
     e.preventDefault();
     const target = e.target as HTMLFormElement;
 
-    if (target.classList.contains('message-form')) {
-      const messageInput = target.querySelector('input[name="message"]') as HTMLInputElement;
+    if (target.classList.contains("message-form")) {
+      const messageInput = target.querySelector(
+        'input[name="message"]'
+      ) as HTMLInputElement;
       if (messageInput) {
         this.handleMessageSend(messageInput.value);
-        messageInput.value = '';
+        messageInput.value = "";
       }
+    } else if (target.id === "createChatForm") {
+      this.handleCreateChatSubmit(e);
     }
   }
 
-    private handleChatSelect(chatId: string, e: Event) {
+  private async handleChatSelect(chatId: string, e: Event) {
     e.preventDefault();
-    console.log(`Выбран чат: ${chatId}`);
+    `Выбран чат: ${chatId}`;
 
-    // Обновляем активный чат
+    // Отключаемся от предыдущего чата
+    if (this.activeChatId && this.activeChatId !== chatId) {
+      webSocketService.disconnect();
+    }
+
     this.activeChatId = chatId;
-    this.messages = this.getMockMessages(chatId);
 
-    console.log(`Активный чат установлен: ${this.activeChatId}, сообщений загружено: ${this.messages.length}`);
+    await this.connectToWebSocket(chatId);
 
-    // Обновляем заголовок и сообщения
     this.updateConversation();
 
-    console.log("Перерендериваем страницу...");
-    // Принудительно перерендериваем всю страницу
     this.forceRender();
   }
 
-  private handleChatDelete(chatId: string) {
-    console.log(`Удаляем чат: ${chatId}`);
+  private async handleChatDelete(chatId: string) {
+    `Удаляем чат: ${chatId}`;
 
-    // Удаляем чат из списка
-    this.chats = this.chats.filter(chat => chat.id !== chatId);
+    try {
+      // Удаляем чат через API
+      await chatAPI.deleteChat(chatId);
 
-    // Если удаляемый чат был активным, сбрасываем активный чат
-    if (this.activeChatId === chatId) {
-      this.activeChatId = null;
-      this.messages = [];
+      // Удаляем чат из списка
+      this.chats = this.chats.filter((chat) => chat.id !== chatId);
+
+      // Если удаляемый чат был активным, сбрасываем активный чат
+      if (this.activeChatId === chatId) {
+        this.activeChatId = null;
+        this.messages = [];
+      }
+
+      this.initializeChatItems();
+      this.updateConversation();
+
+      this.eventBus.emit(Block.EVENTS.FLOW_RENDER);
+    } catch (error) {
+      alert("Ошибка при удалении чата");
     }
-
-    // Обновляем компоненты
-    this.initializeChatItems();
-    this.updateConversation();
-
-    // Принудительно перерендериваем всю страницу
-    this.eventBus.emit(Block.EVENTS.FLOW_RENDER);
   }
 
-  private handleMessageSend(message: string) {
+  private async handleMessageSend(message: string) {
     if (!this.activeChatId) {
-      console.log("Нет активного чата");
       return;
     }
 
-    // Валидация сообщения
     if (!this.validateMessage(message)) {
-      console.log("Сообщение не прошло валидацию");
       return;
     }
 
-    console.log(`Отправка сообщения: ${message}`);
+    try {
+      if (webSocketService.isConnected()) {
+        webSocketService.sendMessage(message);
 
-    const newMessage: ChatMessage = {
-      id: Date.now().toString(),
-      type: 'sent',
-      content: message,
-      time: new Date().toLocaleTimeString('ru-RU', {
-        hour: '2-digit',
-        minute: '2-digit'
-      }),
-      chatId: this.activeChatId,
-    };
+        const activeChat = this.chats.find(
+          (chat) => chat.id === this.activeChatId
+        );
+        if (activeChat) {
+          activeChat.preview = message;
+          activeChat.time = new Date().toLocaleTimeString("ru-RU", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+        }
+      } else {
+        await chatAPI.sendMessage(this.activeChatId, message);
+        await this.loadMessagesForChat(this.activeChatId);
+      }
+    } catch (error) {
+      const newMessage: ChatMessage = {
+        id: Date.now().toString(),
+        type: "sent",
+        content: message,
+        time: new Date().toLocaleTimeString("ru-RU", {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        chatId: this.activeChatId,
+      };
 
-    this.messages.push(newMessage);
-
-    // Обновляем превью в списке чатов
-    const activeChat = this.chats.find(chat => chat.id === this.activeChatId);
-    if (activeChat) {
-      activeChat.preview = message;
-      activeChat.time = newMessage.time;
+      this.messages.unshift(newMessage);
+      this.updateConversation();
+      this.eventBus.emit(Block.EVENTS.FLOW_RENDER);
     }
-
-    this.updateConversation();
-
-    // Принудительно перерендериваем всю страницу
-    this.eventBus.emit(Block.EVENTS.FLOW_RENDER);
   }
 
   private handleMessageInput(event: Event) {
     const target = event.target as HTMLInputElement;
-    console.log("Ввод сообщения:", target.value);
+  }
+
+  private handleKeypress(event: KeyboardEvent) {
+    if (event.key === "Enter" && event.target instanceof HTMLInputElement) {
+      const input = event.target as HTMLInputElement;
+      if (input.name === "message" && input.value.trim()) {
+        event.preventDefault();
+        this.handleMessageSend(input.value.trim());
+        input.value = "";
+      }
+    }
   }
 
   private handleNewChat() {
-    console.log("Создание нового чата");
-    // Логика создания нового чата
+    this.openCreateChatModal();
+  }
+
+  private openCreateChatModal() {
+    const modal = document.getElementById("createChatModal");
+    if (modal) {
+      modal.classList.add("show");
+      document.body.style.overflow = "hidden";
+
+      const input = modal.querySelector("#chatTitle") as HTMLInputElement;
+      if (input) {
+        setTimeout(() => input.focus(), 100);
+      }
+    }
+  }
+
+  private closeCreateChatModal() {
+    const modal = document.getElementById("createChatModal");
+    if (modal) {
+      modal.classList.remove("show");
+      document.body.style.overflow = "";
+
+      const form = modal.querySelector("#createChatForm") as HTMLFormElement;
+      if (form) {
+        form.reset();
+      }
+    }
+  }
+
+  private async handleCreateChatSubmit(event: Event) {
+    event.preventDefault();
+    const form = event.target as HTMLFormElement;
+    const formData = new FormData(form);
+    const title = formData.get("chatTitle") as string;
+
+    if (!title || title.trim() === "") {
+      return;
+    }
+
+    try {
+      const response = await chatAPI.createChat(title.trim());
+
+      // Закрываем модальное окно
+      this.closeCreateChatModal();
+
+      // Перезагружаем список чатов
+      await this.loadChatsFromAPI();
+    } catch (error) {}
   }
 
   private validateMessage(message: string): boolean {
     // Используем новый класс Validator
-    const errors = Validator.validateField('message', message);
+    const errors = Validator.validateField("message", message);
     return errors.length === 0;
   }
 
   private updateConversation() {
     if (this.activeChatId) {
-      const activeChat = this.chats.find(chat => chat.id === this.activeChatId);
+      const activeChat = this.chats.find(
+        (chat) => chat.id === this.activeChatId
+      );
 
       if (activeChat) {
-        console.log("Обновляем заголовок для чата:", activeChat.name);
-
-        // Обновляем заголовок переписки
         this.children.conversationHeader = new ConversationHeader({
           name: activeChat.name,
           avatar: activeChat.avatar,
-          status: activeChat.status || 'online',
+          status: activeChat.status || "online",
           onSettingsClick: () => this.handleChatSettings(),
         });
-
-        console.log("Заголовок обновлен, сообщений:", this.messages.length);
       }
     } else {
-      console.log("Нет активного чата для обновления");
     }
   }
 
@@ -271,16 +476,12 @@ export class ChatPage extends Block {
    * Принудительно обновляет рендер страницы
    */
   private forceRender() {
-    console.log("Принудительное обновление рендера");
-    // Используем публичный метод для перерендеринга
     this.eventBus.emit(Block.EVENTS.FLOW_RENDER);
   }
 
-  private handleChatSettings() {
-    console.log("Открыть настройки чата");
-  }
+  private handleChatSettings() {}
 
-    private static getMockChats(): Chat[] {
+  private static getMockChats(): Chat[] {
     return [
       {
         id: "1",
@@ -289,7 +490,7 @@ export class ChatPage extends Block {
         preview: "Привет! Когда встретимся?",
         time: "15:30",
         unreadCount: 2,
-        status: "online"
+        status: "online",
       },
       {
         id: "2",
@@ -298,7 +499,7 @@ export class ChatPage extends Block {
         preview: "Проект готов к сдаче",
         time: "14:20",
         unreadCount: 0,
-        status: "offline"
+        status: "offline",
       },
       {
         id: "3",
@@ -307,8 +508,8 @@ export class ChatPage extends Block {
         preview: "Спасибо за помощь!",
         time: "12:45",
         unreadCount: 1,
-        status: "online"
-      }
+        status: "online",
+      },
     ];
   }
 
@@ -320,22 +521,22 @@ export class ChatPage extends Block {
           type: "received",
           content: "Привет! Как продвигается проект?",
           time: "12:30",
-          chatId: "1"
+          chatId: "1",
         },
         {
           id: "2",
           type: "sent",
           content: "Привет! Проект почти готов, осталось немного доработать",
           time: "12:32",
-          chatId: "1"
+          chatId: "1",
         },
         {
           id: "3",
           type: "received",
           content: "Отлично! Когда встретимся?",
           time: "12:35",
-          chatId: "1"
-        }
+          chatId: "1",
+        },
       ],
       "2": [
         {
@@ -343,15 +544,15 @@ export class ChatPage extends Block {
           type: "sent",
           content: "Проект готов к сдаче",
           time: "14:20",
-          chatId: "2"
+          chatId: "2",
         },
         {
           id: "5",
           type: "received",
           content: "Проверим и дадим обратную связь",
           time: "14:25",
-          chatId: "2"
-        }
+          chatId: "2",
+        },
       ],
       "3": [
         {
@@ -359,9 +560,9 @@ export class ChatPage extends Block {
           type: "received",
           content: "Спасибо за помощь с кодом!",
           time: "12:45",
-          chatId: "3"
-        }
-      ]
+          chatId: "3",
+        },
+      ],
     };
 
     return messagesByChat[chatId] || [];
@@ -372,15 +573,11 @@ export class ChatPage extends Block {
     const chats = this.chats || [];
     const activeChatId = this.activeChatId || "";
     const messages = this.messages || [];
-    const activeChat = chats.find(chat => chat.id === activeChatId) || {};
-
-    console.log("Rendering with data:", {
-      chats: chats.length,
-      activeChatId,
-      messages: messages.length,
-      activeChat: (activeChat as any).name || 'none',
-      activeChatIdType: typeof activeChatId
-    });
+    const activeChat =
+      chats.find(
+        (chat) =>
+          chat.id === activeChatId || chat.id === activeChatId.toString()
+      ) || {};
 
     return this.compile(chatTemplate, {
       chats,

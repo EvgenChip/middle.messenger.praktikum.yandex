@@ -36,7 +36,7 @@ export const homeTemplate = `
           description="Авторизация пользователя"
           icon="login"
           accent="blue"
-          url="/login"
+          url="/"
         }}
 
         {{> linkCard
@@ -44,15 +44,15 @@ export const homeTemplate = `
           description="Создание нового аккаунта"
           icon="user-add"
           accent="pink"
-          url="/registration"
+          url="/sign-up"
         }}
 
         {{> linkCard
-          title="Профиль"
-          description="Управление данными"
+          title="Настройки"
+          description="Управление профилем"
           icon="profile"
           accent="purple"
-          url="/profile"
+          url="/settings"
         }}
 
         {{> linkCard
@@ -72,11 +72,11 @@ export const homeTemplate = `
         }}
 
         {{> linkCard
-          title="Чат"
+          title="Мессенджер"
           description="Перейти к перепискам"
           icon="message"
           accent="green"
-          url="/chat"
+          url="/messenger"
         }}
       </div>
     </div>

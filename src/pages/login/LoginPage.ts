@@ -6,6 +6,7 @@ import { formInputTemplate } from "../../components/formInput/fornInputTemplate"
 import { buttonTemplate } from "../../components/Button/buttonTemplate";
 import { iconTemplate } from "../../components/icon/iconTebplate";
 import { Validator, ValidationResult } from "../../services/Validator";
+import { chatAPI } from "../../services/api";
 
 // Регистрируем частичные шаблоны
 Handlebars.registerPartial("formInputGroup", formInputGroupTemplate);
@@ -23,65 +24,70 @@ export class LoginPage extends Block {
     super("div", {
       ...props,
       events: {
-        submit: (e: Event) => this.handleSubmit(e),
         click: (e: Event) => this.handleClick(e),
       },
     });
   }
 
-  private handleSubmit(e: Event) {
+  private async handleSubmit(e: Event) {
     e.preventDefault();
     const target = e.target as HTMLFormElement;
 
-    if (target.id === 'loginForm') {
-      this.handleLogin(target);
+    if (target.id === "loginForm") {
+      await this.handleLogin(target);
     }
   }
 
-  private handleLogin(form: HTMLFormElement) {
+  private async handleLogin(form: HTMLFormElement) {
     const formData = new FormData(form);
     const data = {
-      login: String(formData.get('login') || ''),
-      password: String(formData.get('password') || ''),
+      login: String(formData.get("login") || ""),
+      password: String(formData.get("password") || ""),
     };
-
-    console.log("Login attempt with:", data);
 
     // Валидация формы входа
     const validationResult: ValidationResult = Validator.validateForm(data);
 
     if (!validationResult.isValid) {
-      console.error("Login validation errors:", validationResult.errors);
       this.displayValidationErrors(validationResult.fieldErrors);
       return;
     }
 
-    console.log("Login validation passed! Attempting login...");
-    // Здесь будет логика входа на сервер
-    // Пока просто переходим в чат
-    window.location.href = "/chat";
+    try {
+      const response = await chatAPI.login(data);
+
+      (window as any).router.navigate("/messenger");
+    } catch (error) {
+      this.showApiError("Ошибка входа. Проверьте логин и пароль.");
+    }
   }
 
-  private handleClick(e: Event) {
+  private async handleClick(e: Event) {
     const target = e.target as HTMLElement;
 
     if (target.closest('[onClick="loginWithGoogle()"]')) {
       this.loginWithGoogle();
     } else if (target.closest('[onClick="loginWithGithub()"]')) {
       this.loginWithGithub();
+    } else if (target.closest('button[type="submit"]')) {
+      e.preventDefault();
+      const form = this.element?.querySelector("#loginForm") as HTMLFormElement;
+      if (form) {
+        await this.handleLogin(form);
+      } else {
+      }
+    } else {
     }
   }
 
   private loginWithGoogle() {
-    console.log("Login with Google");
     // Здесь будет интеграция с Google OAuth
-    alert('Интеграция с Google в разработке');
+    alert("Интеграция с Google в разработке");
   }
 
   private loginWithGithub() {
-    console.log("Login with GitHub");
     // Здесь будет интеграция с GitHub OAuth
-    alert('Интеграция с GitHub в разработке');
+    alert("Интеграция с GitHub в разработке");
   }
 
   private displayValidationErrors(fieldErrors: Record<string, string[]>) {
@@ -90,14 +96,16 @@ export class LoginPage extends Block {
 
     // Отображаем ошибки для каждого поля
     Object.entries(fieldErrors).forEach(([fieldName, errors]) => {
-      const field = this.element?.querySelector(`[name="${fieldName}"]`) as HTMLElement;
+      const field = this.element?.querySelector(
+        `[name="${fieldName}"]`
+      ) as HTMLElement;
       if (field) {
-        const errorElement = document.createElement('div');
-        errorElement.className = 'validation-error';
+        const errorElement = document.createElement("div");
+        errorElement.className = "validation-error";
         errorElement.textContent = errors[0];
-        errorElement.style.color = '#ff4444';
-        errorElement.style.fontSize = '12px';
-        errorElement.style.marginTop = '5px';
+        errorElement.style.color = "#ff4444";
+        errorElement.style.fontSize = "12px";
+        errorElement.style.marginTop = "5px";
 
         field.parentElement?.appendChild(errorElement);
       }
@@ -105,8 +113,28 @@ export class LoginPage extends Block {
   }
 
   private clearValidationErrors() {
-    const errorElements = this.element?.querySelectorAll('.validation-error');
-    errorElements?.forEach(element => element.remove());
+    const errorElements = this.element?.querySelectorAll(".validation-error");
+    errorElements?.forEach((element) => element.remove());
+  }
+
+  private showApiError(message: string) {
+    // Очищаем предыдущие ошибки
+    this.clearValidationErrors();
+
+    // Создаем элемент ошибки
+    const errorElement = document.createElement("div");
+    errorElement.className = "validation-error";
+    errorElement.textContent = message;
+    errorElement.style.color = "#ff4444";
+    errorElement.style.fontSize = "14px";
+    errorElement.style.marginTop = "10px";
+    errorElement.style.textAlign = "center";
+
+    // Вставляем ошибку в форму
+    const form = this.element?.querySelector("#loginForm");
+    if (form) {
+      form.appendChild(errorElement);
+    }
   }
 
   protected render() {
@@ -116,4 +144,3 @@ export class LoginPage extends Block {
     });
   }
 }
-

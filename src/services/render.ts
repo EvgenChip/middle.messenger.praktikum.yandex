@@ -14,7 +14,6 @@ export function render(query: string, block: Block): HTMLElement {
   setTimeout(() => {
     const content = block.getContent();
     if (!content) {
-      console.error('Block content:', block);
       throw new Error("Render failed: content is empty");
     }
 

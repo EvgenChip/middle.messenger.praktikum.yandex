@@ -56,4 +56,41 @@ export const chatTemplate = `
     {{/if}}
   </div>
 </div>
+
+<!-- Модальное окно создания чата -->
+<div class="modal" id="createChatModal">
+  <div class="modal-content">
+    <h2 class="modal-title">СОЗДАТЬ НОВЫЙ ЧАТ</h2>
+    <form id="createChatForm">
+      <div class="input-group">
+        <label class="input-group__label" for="chatTitle">
+          НАЗВАНИЕ ЧАТА
+          <span class="input-group__required">*</span>
+        </label>
+        <input
+          class="input-group__input"
+          type="text"
+          id="chatTitle"
+          name="chatTitle"
+          placeholder="Введите название чата"
+          required
+        >
+        <div class="input-group__icon">
+          <svg class="icon icon--message" viewBox="0 0 24 24">
+            <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" type="submit">
+          СОЗДАТЬ
+          <span class="btn__icon">plus</span>
+        </button>
+        <button class="btn" type="button" data-action="closeCreateChatModal">
+          ОТМЕНА
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
 `;

@@ -14,7 +14,6 @@ class EventBus {
     if (!this.listeners[event]) {
       this.listeners[event] = [];
     }
-    // Добавляем колбэк в массив соответствующих событий
     this.listeners[event].push(callback);
   }
 

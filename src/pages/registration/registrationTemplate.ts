@@ -87,7 +87,7 @@ export const registrationTemplate = `
 
     <div class="registration-form__footer">
       УЖЕ ЕСТЬ АККАУНТ?
-      <a href="/login" class="neon-link">ВОЙТИ</a>
+      <a href="/" class="neon-link">ВОЙТИ</a>
     </div>
   </div>
 </div>

@@ -28,6 +28,9 @@ const router = new Router();
 // Делаем HTTP клиент доступным глобально для тестирования
 (window as any).httpClient = httpClient;
 
+import { webSocketService } from "./services/WebSocketService";
+(window as any).webSocketService = webSocketService;
+
 // Запускаем роутер при загрузке страницы
 document.addEventListener("DOMContentLoaded", () => {
   router.start();

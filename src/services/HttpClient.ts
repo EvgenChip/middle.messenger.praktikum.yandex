@@ -22,29 +22,44 @@ export class HttpClient {
   /**
    * GET запрос с поддержкой query string
    */
-  public async get<T = any>(url: string, config?: HttpRequestConfig): Promise<HttpResponse<T>> {
-    return this.request<T>('GET', url, undefined, config);
+  public async get<T = any>(
+    url: string,
+    config?: HttpRequestConfig
+  ): Promise<HttpResponse<T>> {
+    return this.request<T>("GET", url, undefined, config);
   }
 
   /**
    * POST запрос с body
    */
-  public async post<T = any>(url: string, data?: any, config?: HttpRequestConfig): Promise<HttpResponse<T>> {
-    return this.request<T>('POST', url, data, config);
+  public async post<T = any>(
+    url: string,
+    data?: any,
+    config?: HttpRequestConfig
+  ): Promise<HttpResponse<T>> {
+    return this.request<T>("POST", url, data, config);
   }
 
   /**
    * PUT запрос с body
    */
-  public async put<T = any>(url: string, data?: any, config?: HttpRequestConfig): Promise<HttpResponse<T>> {
-    return this.request<T>('PUT', url, data, config);
+  public async put<T = any>(
+    url: string,
+    data?: any,
+    config?: HttpRequestConfig
+  ): Promise<HttpResponse<T>> {
+    return this.request<T>("PUT", url, data, config);
   }
 
   /**
    * DELETE запрос с body (опционально)
    */
-  public async delete<T = any>(url: string, data?: any, config?: HttpRequestConfig): Promise<HttpResponse<T>> {
-    return this.request<T>('DELETE', url, data, config);
+  public async delete<T = any>(
+    url: string,
+    data?: any,
+    config?: HttpRequestConfig
+  ): Promise<HttpResponse<T>> {
+    return this.request<T>("DELETE", url, data, config);
   }
 
   /**
@@ -56,6 +71,7 @@ export class HttpClient {
     data?: any,
     config?: HttpRequestConfig
   ): Promise<HttpResponse<T>> {
+    `🌐 HTTP ${method} ${url}`, { data, config };
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       const timeout = config?.timeout || this.defaultTimeout;
@@ -70,7 +86,9 @@ export class HttpClient {
             // Успешный ответ
             let responseData: T;
             try {
-              responseData = xhr.responseText ? JSON.parse(xhr.responseText) : null;
+              responseData = xhr.responseText
+                ? JSON.parse(xhr.responseText)
+                : null;
             } catch {
               responseData = xhr.responseText as T;
             }
@@ -79,16 +97,36 @@ export class HttpClient {
               data: responseData,
               status: xhr.status,
               statusText: xhr.statusText,
-              headers: this.parseHeaders(xhr.getAllResponseHeaders())
+              headers: this.parseHeaders(xhr.getAllResponseHeaders()),
             };
+
+            // Логируем cookies для отладки
 
             resolve(response);
           } else {
             // Ошибка HTTP
+            let errorMessage = `HTTP Error ${xhr.status}: ${xhr.statusText}`;
+
+            // Пытаемся получить детали ошибки из ответа
+            try {
+              const errorData = xhr.responseText
+                ? JSON.parse(xhr.responseText)
+                : null;
+
+              if (errorData && errorData.reason) {
+                errorMessage += ` - ${errorData.reason}`;
+              }
+            } catch {
+              // Если не удалось распарсить JSON, используем текст ответа
+              if (xhr.responseText) {
+                errorMessage += ` - ${xhr.responseText}`;
+              }
+            }
+
             const error: HttpError = {
-              message: `HTTP Error ${xhr.status}: ${xhr.statusText}`,
+              message: errorMessage,
               status: xhr.status,
-              statusText: xhr.statusText
+              statusText: xhr.statusText,
             };
             reject(error);
           }
@@ -98,7 +136,7 @@ export class HttpClient {
       // Обработчик ошибок
       xhr.onerror = () => {
         const error: HttpError = {
-          message: 'Network Error: Failed to fetch'
+          message: "Network Error: Failed to fetch",
         };
         reject(error);
       };
@@ -106,13 +144,16 @@ export class HttpClient {
       // Обработчик таймаута
       xhr.ontimeout = () => {
         const error: HttpError = {
-          message: `Request timeout after ${timeout}ms`
+          message: `Request timeout after ${timeout}ms`,
         };
         reject(error);
       };
 
       // Открываем соединение
       xhr.open(method, url, true);
+
+      // Включаем поддержку cookies для авторизации
+      xhr.withCredentials = true;
 
       // Устанавливаем заголовки
       if (config?.headers) {
@@ -121,18 +162,28 @@ export class HttpClient {
         });
       }
 
-      // Устанавливаем Content-Type для POST/PUT/DELETE с данными
-      if (data && ['POST', 'PUT', 'DELETE'].includes(method)) {
-        if (typeof data === 'object') {
-          xhr.setRequestHeader('Content-Type', 'application/json');
-        } else {
-          xhr.setRequestHeader('Content-Type', 'text/plain');
+      // Устанавливаем Content-Type для POST/PUT/DELETE с данными, если не установлен в заголовках
+      if (data && ["POST", "PUT", "DELETE"].includes(method)) {
+        const hasContentType =
+          config?.headers &&
+          Object.keys(config.headers).some(
+            (key) => key.toLowerCase() === "content-type"
+          );
+
+        if (!hasContentType) {
+          if (typeof data === "object") {
+            xhr.setRequestHeader("Content-Type", "application/json");
+          } else {
+            xhr.setRequestHeader("Content-Type", "text/plain");
+          }
         }
       }
 
       // Отправляем запрос
       if (data) {
-        const requestData = typeof data === 'object' ? JSON.stringify(data) : String(data);
+        const requestData =
+          typeof data === "object" ? JSON.stringify(data) : String(data);
+        `📤 Sending data:`, requestData;
         xhr.send(requestData);
       } else {
         xhr.send();
@@ -148,10 +199,10 @@ export class HttpClient {
 
     if (!headersString) return headers;
 
-    const headerPairs = headersString.split('\u000d\u000a');
+    const headerPairs = headersString.split("\u000d\u000a");
 
     for (const pair of headerPairs) {
-      const index = pair.indexOf('\u003a\u0020');
+      const index = pair.indexOf("\u003a\u0020");
       if (index > 0) {
         const key = pair.substring(0, index);
         const value = pair.substring(index + 2);
@@ -175,7 +226,7 @@ export class HttpClient {
     Object.entries(params).forEach(([key, value]) => {
       if (value !== null && value !== undefined) {
         if (Array.isArray(value)) {
-          value.forEach(item => url.searchParams.append(key, String(item)));
+          value.forEach((item) => url.searchParams.append(key, String(item)));
         } else {
           url.searchParams.append(key, String(value));
         }
@@ -188,18 +239,12 @@ export class HttpClient {
   /**
    * Установка базового URL для всех запросов
    */
-  public setBaseUrl(_baseUrl: string): void {
-    // Можно добавить логику для хранения базового URL
-    // и автоматического добавления к относительным путям
-  }
+  public setBaseUrl(_baseUrl: string): void {}
 
   /**
    * Установка заголовка авторизации
    */
-  public setAuthToken(_token: string): void {
-    // Можно добавить логику для автоматического добавления
-    // заголовка Authorization ко всем запросам
-  }
+  public setAuthToken(_token: string): void {}
 }
 
 // Экспортируем экземпляр по умолчанию
