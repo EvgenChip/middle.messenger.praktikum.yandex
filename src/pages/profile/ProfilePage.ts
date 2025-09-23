@@ -79,7 +79,7 @@ export class ProfilePage extends Block {
 
   private async handleProfileUpdate(form: HTMLFormElement) {
     const formData = new FormData(form);
-    const data: any = {};
+    const data: Record<string, string> = {};
 
     const email = String(formData.get("email") || "").trim();
     const login = String(formData.get("login") || "").trim();
@@ -206,9 +206,11 @@ export class ProfilePage extends Block {
   private async logout() {
     try {
       await chatAPI.logout();
+      // any используется для доступа к глобальному роутеру
       (window as any).router.navigate("/");
     } catch (error) {
       // В случае ошибки все равно перенаправляем на логин
+      // any используется для доступа к глобальному роутеру
       (window as any).router.navigate("/");
     }
   }

@@ -45,6 +45,17 @@ export interface Chat {
   unread_count: number;
 }
 
+export interface UserSearchResult {
+  id: number;
+  first_name: string;
+  second_name: string;
+  display_name: string;
+  login: string;
+  email: string;
+  phone: string;
+  avatar: string;
+}
+
 // API сервис для работы с чатом
 export class ChatAPI {
   private baseUrl = "https://ya-praktikum.tech/api/v2"; // Пример базового URL
@@ -82,7 +93,7 @@ export class ChatAPI {
         `Login failed with status: ${response.status}`;
         throw new Error(`Login failed with status: ${response.status}`);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Показываем детали ошибки от API
       if (error.message) {
       }
@@ -122,7 +133,7 @@ export class ChatAPI {
       );
 
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Показываем детали ошибки от API
       if (error.message && error.message.includes("User already in system")) {
         ("✅ User already exists - this is expected for existing users");
@@ -278,7 +289,7 @@ export class ChatAPI {
       );
 
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       throw error;
     }
   }
@@ -379,9 +390,9 @@ export class ChatAPI {
   /**
    * Поиск пользователей по логину
    */
-  async searchUsers(login: string): Promise<any[]> {
+  async searchUsers(login: string): Promise<UserSearchResult[]> {
     try {
-      const response = await httpClient.post<any[]>(
+      const response = await httpClient.post<UserSearchResult[]>(
         `${this.baseUrl}/user/search`,
         { login }
       );

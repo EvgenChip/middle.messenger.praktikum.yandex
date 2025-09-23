@@ -3,7 +3,7 @@ export interface HttpRequestConfig {
   timeout?: number;
 }
 
-export interface HttpResponse<T = any> {
+export interface HttpResponse<T = unknown> {
   data: T;
   status: number;
   statusText: string;
@@ -22,7 +22,7 @@ export class HttpClient {
   /**
    * GET запрос с поддержкой query string
    */
-  public async get<T = any>(
+  public async get<T = unknown>(
     url: string,
     config?: HttpRequestConfig
   ): Promise<HttpResponse<T>> {
@@ -32,9 +32,9 @@ export class HttpClient {
   /**
    * POST запрос с body
    */
-  public async post<T = any>(
+  public async post<T = unknown>(
     url: string,
-    data?: any,
+    data?: unknown,
     config?: HttpRequestConfig
   ): Promise<HttpResponse<T>> {
     return this.request<T>("POST", url, data, config);
@@ -43,9 +43,9 @@ export class HttpClient {
   /**
    * PUT запрос с body
    */
-  public async put<T = any>(
+  public async put<T = unknown>(
     url: string,
-    data?: any,
+    data?: unknown,
     config?: HttpRequestConfig
   ): Promise<HttpResponse<T>> {
     return this.request<T>("PUT", url, data, config);
@@ -54,9 +54,9 @@ export class HttpClient {
   /**
    * DELETE запрос с body (опционально)
    */
-  public async delete<T = any>(
+  public async delete<T = unknown>(
     url: string,
-    data?: any,
+    data?: unknown,
     config?: HttpRequestConfig
   ): Promise<HttpResponse<T>> {
     return this.request<T>("DELETE", url, data, config);
@@ -68,7 +68,7 @@ export class HttpClient {
   private request<T>(
     method: string,
     url: string,
-    data?: any,
+    data?: unknown,
     config?: HttpRequestConfig
   ): Promise<HttpResponse<T>> {
     `🌐 HTTP ${method} ${url}`, { data, config };
@@ -216,7 +216,7 @@ export class HttpClient {
   /**
    * Создание URL с query параметрами
    */
-  public buildUrl(baseUrl: string, params?: Record<string, any>): string {
+  public buildUrl(baseUrl: string, params?: Record<string, unknown>): string {
     if (!params || Object.keys(params).length === 0) {
       return baseUrl;
     }

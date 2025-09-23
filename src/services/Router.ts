@@ -7,8 +7,8 @@ import { ErrorPage } from "../pages/errorsPage/ErrorPage";
 
 export interface Route {
   path: string;
-  component: any;
-  props?: any;
+  component: new (props?: unknown) => Block; // Constructor type for Block components
+  props?: Record<string, unknown>; // Props object with unknown values
 }
 
 export class Router {

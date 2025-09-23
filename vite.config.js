@@ -6,10 +6,9 @@ export default defineConfig({
   root: resolve(__dirname, "src"),
   build: {
     outDir: resolve(__dirname, "dist"),
+    emptyOutDir: true,
     rollupOptions: {
-      input: {
-        main: resolve(__dirname, "src/index.html"), // Главная точка входа
-      },
+      input: resolve(__dirname, "src/index.html"),
     },
   },
   plugins: [
@@ -25,5 +24,4 @@ export default defineConfig({
     open: "/",
     host: true,
   },
-  assetsInclude: ["**/*.html"],
 });

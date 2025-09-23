@@ -52,6 +52,7 @@ export class RegistrationPage extends Block {
     }
     try {
       const response = await chatAPI.register(data);
+      // any используется для доступа к глобальному роутеру
       (window as any).router.navigate("/messenger");
     } catch (error) {}
   }

@@ -56,6 +56,7 @@ export class LoginPage extends Block {
     try {
       const response = await chatAPI.login(data);
 
+      // any используется для доступа к глобальному роутеру
       (window as any).router.navigate("/messenger");
     } catch (error) {
       this.showApiError("Ошибка входа. Проверьте логин и пароль.");

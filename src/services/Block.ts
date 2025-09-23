@@ -3,6 +3,7 @@ import Handlebars from "handlebars";
 import { v4 as uuidv4 } from "uuid";
 
 // Регистрируем helper eq
+// any используется для совместимости с Handlebars, который принимает любые значения для сравнения
 Handlebars.registerHelper("eq", function (a: any, b: any) {
   return a === b;
 });
@@ -85,6 +86,7 @@ class Block {
         } else if (Array.isArray(anyProps[key])) {
           lists[key] = anyProps[key].filter((item) => item instanceof Block);
         } else {
+          // any используется для приведения типов из anyProps к типу свойства Block
           props[key] = anyProps[key] as any;
         }
       });
