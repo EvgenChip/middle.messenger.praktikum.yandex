@@ -112,9 +112,10 @@ export class ChatPage extends Block {
     try {
       const apiMessages = await chatAPI.getChatMessages(chatId);
 
+      const currentUserId = await this.getCurrentUserId();
       this.messages = apiMessages.map((message) => ({
         id: message.id,
-        type: message.user_id === this.getCurrentUserId() ? "sent" : "received",
+        type: message.user_id === currentUserId ? "sent" : "received",
         content: message.content,
         time: new Date(message.time).toLocaleTimeString("ru-RU", {
           hour: "2-digit",
@@ -145,9 +146,9 @@ export class ChatPage extends Block {
         chatId,
         onMessage: (message) => this.handleWebSocketMessage(message),
         onMessages: (messages) => this.handleWebSocketMessages(messages),
-        onConnect: () => ("✅ WebSocket connected to chat:", chatId),
-        onDisconnect: () => ("🔌 WebSocket disconnected from chat:", chatId),
-        onError: (error) => ("❌ WebSocket error:", error),
+        onConnect: () => console.log("✅ WebSocket connected to chat:", chatId),
+        onDisconnect: () => console.log("🔌 WebSocket disconnected from chat:", chatId),
+        onError: (error) => console.log("❌ WebSocket error:", error),
       });
     } catch (error) {
       await this.loadMessagesForChat(chatId);
@@ -382,8 +383,8 @@ export class ChatPage extends Block {
     }
   }
 
-  private handleMessageInput(event: Event) {
-    const target = event.target as HTMLInputElement;
+  private handleMessageInput(_event: Event) {
+    // Обработчик для будущего использования
   }
 
   private handleKeypress(event: KeyboardEvent) {
@@ -438,7 +439,7 @@ export class ChatPage extends Block {
     }
 
     try {
-      const response = await chatAPI.createChat(title.trim());
+      await chatAPI.createChat(title.trim());
 
       // Закрываем модальное окно
       this.closeCreateChatModal();

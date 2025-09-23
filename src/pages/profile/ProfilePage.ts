@@ -61,7 +61,7 @@ export class ProfilePage extends Block {
       this.setProps({ user: userData });
 
       // Принудительно перерендериваем компонент
-      this._render();
+      this.eventBus.emit(Block.EVENTS.FLOW_RENDER);
     } catch (error) {
       alert("Не удалось загрузить данные профиля");
     }

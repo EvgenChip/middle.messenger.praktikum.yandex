@@ -1,4 +1,5 @@
 import { render } from "./render";
+import Block from "./Block";
 import { HomePage } from "../pages/homePage/HomePage";
 import { LoginPage } from "../pages/login/LoginPage";
 import { RegistrationPage } from "../pages/registration/RegistrationPage";
@@ -7,7 +8,7 @@ import { ErrorPage } from "../pages/errorsPage/ErrorPage";
 
 export interface Route {
   path: string;
-  component: new (props?: unknown) => Block; // Constructor type for Block components
+  component: new (props?: any) => Block; // any используется для совместимости с разными типами props
   props?: Record<string, unknown>; // Props object with unknown values
 }
 
@@ -56,7 +57,7 @@ export class Router {
       },
       {
         path: "/messenger",
-        component: null, // Будет загружаться динамически
+        component: ErrorPage, // Заглушка для динамической загрузки
         props: {},
       },
       {

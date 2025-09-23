@@ -29,14 +29,6 @@ export class LoginPage extends Block {
     });
   }
 
-  private async handleSubmit(e: Event) {
-    e.preventDefault();
-    const target = e.target as HTMLFormElement;
-
-    if (target.id === "loginForm") {
-      await this.handleLogin(target);
-    }
-  }
 
   private async handleLogin(form: HTMLFormElement) {
     const formData = new FormData(form);
@@ -54,7 +46,7 @@ export class LoginPage extends Block {
     }
 
     try {
-      const response = await chatAPI.login(data);
+      await chatAPI.login(data);
 
       // any используется для доступа к глобальному роутеру
       (window as any).router.navigate("/messenger");

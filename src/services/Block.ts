@@ -173,8 +173,7 @@ class Block {
     this.componentDidMount();
   }
 
-  componentDidMount(oldProps?: BlockProps): void {
-  }
+  componentDidMount(_oldProps?: BlockProps): void {}
 
   dispatchComponentDidMount(): void {
     this.eventBus.emit(Block.EVENTS.FLOW_CDM);
@@ -187,8 +186,7 @@ class Block {
     return oldProps !== newProps;
   }
 
-  componentDidUpdate(oldProps?: BlockProps, newProps?: BlockProps): boolean {
-(oldProps, newProps);
+  componentDidUpdate(_oldProps?: BlockProps, _newProps?: BlockProps): boolean {
     return true;
   }
 

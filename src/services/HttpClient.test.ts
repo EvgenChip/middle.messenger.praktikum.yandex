@@ -163,7 +163,7 @@ export class HttpClientDemo {
 
       console.log("✅ Заголовки отправлены:", {
         status: response.status,
-        receivedHeaders: response.data.headers,
+        receivedHeaders: (response.data as any).headers,
       });
 
       return response;

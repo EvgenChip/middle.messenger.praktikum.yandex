@@ -71,7 +71,7 @@ export class HttpClient {
     data?: unknown,
     config?: HttpRequestConfig
   ): Promise<HttpResponse<T>> {
-    `🌐 HTTP ${method} ${url}`, { data, config };
+    console.log(`🌐 HTTP ${method} ${url}`, { data, config });
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       const timeout = config?.timeout || this.defaultTimeout;
@@ -183,7 +183,7 @@ export class HttpClient {
       if (data) {
         const requestData =
           typeof data === "object" ? JSON.stringify(data) : String(data);
-        `📤 Sending data:`, requestData;
+        console.log(`📤 Sending data:`, requestData);
         xhr.send(requestData);
       } else {
         xhr.send();

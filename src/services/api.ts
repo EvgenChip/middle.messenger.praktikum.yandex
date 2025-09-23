@@ -95,11 +95,12 @@ export class ChatAPI {
       }
     } catch (error: unknown) {
       // Показываем детали ошибки от API
-      if (error.message) {
+      if (error instanceof Error && error.message) {
+        console.error("Login error:", error.message);
       }
 
       // Если пользователь уже в системе, считаем это успешным логином
-      if (error.message && error.message.includes("User already in system")) {
+      if (error instanceof Error && error.message && error.message.includes("User already in system")) {
         localStorage.setItem("authToken", "authenticated");
 
         // Создаем фиктивный ответ для уже авторизованного пользователя
@@ -135,8 +136,8 @@ export class ChatAPI {
       return response.data;
     } catch (error: unknown) {
       // Показываем детали ошибки от API
-      if (error.message && error.message.includes("User already in system")) {
-        ("✅ User already exists - this is expected for existing users");
+      if (error instanceof Error && error.message && error.message.includes("User already in system")) {
+        console.log("✅ User already exists - this is expected for existing users");
         // Создаем фиктивный ответ для существующего пользователя
         const mockResponse: LoginResponse = {
           token: "user-exists",
