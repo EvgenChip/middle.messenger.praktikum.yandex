@@ -189,6 +189,7 @@ export class HttpClient {
 
         if (!hasContentType) {
           if (data instanceof FormData) {
+            // Для FormData не устанавливаем Content-Type
           } else if (typeof data === "object") {
             xhr.setRequestHeader("Content-Type", "application/json");
           } else {

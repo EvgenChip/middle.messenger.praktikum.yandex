@@ -11,7 +11,7 @@ type EventBusType = {
   emit: (event: string, ...args: unknown[]) => void;
 };
 
-interface BlockProps {
+export interface BlockProps {
   [key: string]: Block | object | (() => void) | string | boolean | undefined;
   _id: string | undefined;
 }

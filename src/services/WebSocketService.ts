@@ -268,8 +268,8 @@ export class WebSocketService {
         return;
       }
 
-    } catch (error) {
-
+    } catch {
+      // Игнорируем ошибки парсинга
     }
   }
 

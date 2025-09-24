@@ -47,7 +47,7 @@ export class LoginPage extends Block {
       await chatAPI.login(data);
 
       (window as any).router.navigate("/messenger");
-    } catch (error) {
+    } catch {
       this.showApiError("Ошибка входа. Проверьте логин и пароль.");
     }
   }
@@ -65,8 +65,10 @@ export class LoginPage extends Block {
       if (form) {
         await this.handleLogin(form);
       } else {
+        // Форма не найдена
       }
     } else {
+      // Обработчик не найден
     }
   }
 

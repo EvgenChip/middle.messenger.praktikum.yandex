@@ -205,7 +205,9 @@ export class Router {
     try {
       const { chatAPI } = await import("./api");
       await chatAPI.logout();
-    } catch {}
+    } catch {
+      // Игнорируем ошибки
+    }
     this.navigate("/");
   }
 }

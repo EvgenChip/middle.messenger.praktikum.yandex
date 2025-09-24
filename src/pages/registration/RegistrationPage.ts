@@ -50,7 +50,9 @@ export class RegistrationPage extends Block {
     try {
       await chatAPI.register(data);
       (window as any).router.navigate("/messenger");
-    } catch (error) {}
+    } catch {
+      // Игнорируем ошибки
+    }
   }
 
   private displayValidationErrors(fieldErrors: Record<string, string[]>) {

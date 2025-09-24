@@ -627,12 +627,6 @@ export class ChatPage extends Block {
     });
   }
 
-  private handleChatSettings() {
-    if (!this.activeChatId) {
-      return;
-    }
-    this.openUserManagementModal();
-  }
 
   private openUserManagementModal() {
     const modal = document.getElementById("userManagementModal");

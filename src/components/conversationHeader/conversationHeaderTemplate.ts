@@ -11,4 +11,4 @@ export const conversationHeaderTemplate = `<div class="conversation-header">
   <button class="chat-settings">
     {{> icon name="settings"}}
   </button>
-</div>`
+</div>`;

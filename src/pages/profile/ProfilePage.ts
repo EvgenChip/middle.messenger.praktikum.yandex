@@ -1,4 +1,4 @@
-import Block from "../../services/Block";
+import Block, { BlockProps } from "../../services/Block";
 import Handlebars from "handlebars";
 import { profileTemplate } from "./profileTemplate";
 import { formInputGroupTemplate } from "../../components/formInputGroup/formInputGroupTemplate";
@@ -55,8 +55,9 @@ export class ProfilePage extends Block {
     this.setupAvatarUpload();
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(_oldProps?: BlockProps, _newProps?: BlockProps): boolean {
     this.setupAvatarUpload();
+    return true;
   }
 
   private setupAvatarUpload() {
@@ -203,7 +204,6 @@ export class ProfilePage extends Block {
         fileInput.click();
       }
     } else if (target.id === "passwordModal") {
-
       this.closePasswordModal();
     }
   }
@@ -227,7 +227,7 @@ export class ProfilePage extends Block {
   }
 
   private async logout() {
-    await(window as any).router.logout();
+    await (window as any).router.logout();
   }
 
   private async handleAvatarUpload(e: Event) {
@@ -255,7 +255,9 @@ export class ProfilePage extends Block {
       this.user = { ...this.user, ...response };
       this.setProps({ user: this.user });
 
-      this.updateAvatarInDOM(response.avatar);
+      if (response.avatar) {
+        this.updateAvatarInDOM(response.avatar);
+      }
 
       this.eventBus.emit(Block.EVENTS.FLOW_RENDER);
 
@@ -325,7 +327,6 @@ export class ProfilePage extends Block {
   }
 
   private displayValidationErrors(fieldErrors: Record<string, string[]>) {
-    // Очищаем предыдущие ошибки
     this.clearValidationErrors();
 
     Object.entries(fieldErrors).forEach(([fieldName, errors]) => {
@@ -358,4 +359,3 @@ export class ProfilePage extends Block {
     });
   }
 }
-
