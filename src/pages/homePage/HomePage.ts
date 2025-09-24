@@ -4,7 +4,6 @@ import { homeTemplate } from "./homeTemplate";
 import { linkCardTemplate } from "../../components/linkCard/linkCardTemplate";
 import { iconTemplate } from "../../components/icon/iconTebplate";
 
-// Регистрируем частичные шаблоны
 Handlebars.registerPartial("linkCard", linkCardTemplate);
 Handlebars.registerPartial("icon", iconTemplate);
 

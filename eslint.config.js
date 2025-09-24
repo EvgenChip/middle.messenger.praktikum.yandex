@@ -44,10 +44,9 @@ export default [
       '@typescript-eslint': tseslint,
     },
     rules: {
-      // Базовые правила
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': ['warn', { 'argsIgnorePattern': '^_' }],
-      '@typescript-eslint/no-explicit-any': 'off', // Разрешаем any с комментариями
+      '@typescript-eslint/no-explicit-any': 'off',
       'no-console': 'warn', // Предупреждение вместо ошибки
       'no-empty': 'warn',
       'no-useless-catch': 'off',
@@ -59,9 +58,8 @@ export default [
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-inferrable-types': 'off',
 
-      // Общие правила стиля - делаем мягче
       'indent': 'off', // Отключаем жесткие правила отступов
-      'quotes': 'off', // Отключаем жесткие правила кавычек
+      'quotes': 'off',
       'semi': ['warn', 'always'],
     },
   },

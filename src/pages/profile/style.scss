@@ -227,7 +227,6 @@
       justify-content: center;
     }
 
-    // Анимация появления
     @keyframes modalSlideIn {
       from {
         opacity: 0;
@@ -239,7 +238,6 @@
       }
     }
 
-    // Анимация градиента
     @keyframes gradientShift {
       0%, 100% {
         background: linear-gradient(45deg,

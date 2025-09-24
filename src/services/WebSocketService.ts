@@ -82,7 +82,6 @@ export class WebSocketService {
         const { chatAPI } = await import('./api');
         const tokenResponse = await chatAPI.getWebSocketToken(config.chatId);
 
-        // Получаем ID текущего пользователя
         const userData = await chatAPI.getCurrentUser();
         const userId = userData.id;
 
@@ -181,7 +180,7 @@ export class WebSocketService {
     }
 
     const pingMessage = {
-      type: 'ping'  // Согласно документации, content не нужен для ping
+      type: 'ping'
     };
 
     this.ws!.send(JSON.stringify(pingMessage));
@@ -248,7 +247,6 @@ export class WebSocketService {
         return;
       }
 
-      // Обработка уведомления о подключении пользователя
       if (data.type === 'user connected') {
 
         return;
@@ -322,5 +320,4 @@ export class WebSocketService {
   }
 }
 
-// Создаем глобальный экземпляр
 export const webSocketService = new WebSocketService();

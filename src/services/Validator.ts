@@ -38,7 +38,7 @@ export class Validator {
       required: true,
       minLength: 3,
       maxLength: 20,
-      custom: (value: string) => !/^\d+$/.test(value), // Не должен состоять только из цифр
+      custom: (value: string) => !/^\d+$/.test(value),
     },
     email: {
       name: "Email",
@@ -51,7 +51,7 @@ export class Validator {
         if (parts.length !== 2) return false;
         const domainParts = parts[1].split(".");
         if (domainParts.length < 2) return false;
-        return /^[a-zA-Z]+$/.test(domainParts[domainParts.length - 2]); // Перед точкой должны быть буквы
+        return /^[a-zA-Z]+$/.test(domainParts[domainParts.length - 2]);
       },
     },
     password: {
@@ -100,13 +100,11 @@ export class Validator {
 
     const errors: string[] = [];
 
-    // Проверка на обязательность
     if (rule.required && (!value || value.trim().length === 0)) {
       errors.push(`${rule.name} обязательно для заполнения`);
       return errors;
     }
 
-    // Если поле не обязательное и пустое - пропускаем
     if (!rule.required && (!value || value.trim().length === 0)) {
       return errors;
     }
@@ -129,7 +127,6 @@ export class Validator {
       errors.push(rule.message);
     }
 
-    // Кастомная валидация
     if (rule.custom && !rule.custom(value)) {
       errors.push(rule.message);
     }

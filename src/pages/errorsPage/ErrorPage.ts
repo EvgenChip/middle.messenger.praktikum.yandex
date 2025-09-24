@@ -3,7 +3,6 @@ import Handlebars from "handlebars";
 import { errorTemplate } from "./errorTemplate";
 import { iconTemplate } from "../../components/icon/iconTebplate";
 
-// Регистрируем частичные шаблоны
 Handlebars.registerPartial("icon", iconTemplate);
 
 interface ErrorPageProps {
@@ -27,7 +26,6 @@ export class ErrorPage extends Block {
     });
     this.errorCode = props.errorCode;
 
-    // Рандомные заголовки и сообщения для каждой ошибки
     if (this.errorCode === "404") {
       this.randomTitles = [
         "ОШИБКА: КОТ НАСТРОЙКИ",
@@ -58,10 +56,8 @@ export class ErrorPage extends Block {
   }
 
   componentDidMount() {
-    // Инициализация анимации мигающего курсора
     this.initBlinkAnimation();
 
-    // Установка случайных заголовка и сообщения
     this.setRandomContent();
   }
 
@@ -95,7 +91,6 @@ export class ErrorPage extends Block {
       // Переход на главную страницу
       window.location.href = "../homePage/index.html";
     } else if (target.closest('#reload-button')) {
-      // Перезагрузка страницы (только для 500)
       if (this.errorCode === "500") {
         window.location.reload();
       }

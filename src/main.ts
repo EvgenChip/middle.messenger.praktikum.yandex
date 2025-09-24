@@ -22,19 +22,14 @@ import { httpClient } from "./services/HttpClient";
 // Инициализируем роутер
 const router = new Router();
 
-// any используется для расширения глобального объекта window в dev-режиме
-// Делаем роутер доступным глобально для страниц ошибок
 (window as any).router = router;
 
-// any используется для расширения глобального объекта window в dev-режиме
-// Делаем HTTP клиент доступным глобально для тестирования
 (window as any).httpClient = httpClient;
 
 import { webSocketService } from "./services/WebSocketService";
-// any используется для расширения глобального объекта window в dev-режиме
 (window as any).webSocketService = webSocketService;
 
 // Запускаем роутер при загрузке страницы
-document.addEventListener("DOMContentLoaded", () => {
-  router.start();
+document.addEventListener("DOMContentLoaded", async () => {
+  await router.start();
 });

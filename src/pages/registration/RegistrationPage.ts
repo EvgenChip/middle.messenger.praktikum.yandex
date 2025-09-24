@@ -8,7 +8,6 @@ import { iconTemplate } from "../../components/icon/iconTebplate";
 import { Validator, ValidationResult } from "../../services/Validator";
 import { chatAPI } from "../../services/api";
 
-// Регистрируем частичные шаблоны
 Handlebars.registerPartial("formInputGroup", formInputGroupTemplate);
 Handlebars.registerPartial("formInput", formInputTemplate);
 Handlebars.registerPartial("btn", buttonTemplate);
@@ -33,7 +32,6 @@ export class RegistrationPage extends Block {
     e.preventDefault();
     const target = e.target as HTMLFormElement;
 
-    // Собираем данные формы
     const formData = new FormData(target);
     const data = {
       first_name: String(formData.get("first_name") || ""),
@@ -43,7 +41,6 @@ export class RegistrationPage extends Block {
       password: String(formData.get("password") || ""),
       phone: String(formData.get("phone") || ""),
     };
-    // Валидация формы
     const validationResult: ValidationResult = Validator.validateForm(data);
 
     if (!validationResult.isValid) {
@@ -52,7 +49,6 @@ export class RegistrationPage extends Block {
     }
     try {
       await chatAPI.register(data);
-      // any используется для доступа к глобальному роутеру
       (window as any).router.navigate("/messenger");
     } catch (error) {}
   }
@@ -61,7 +57,6 @@ export class RegistrationPage extends Block {
     // Очищаем предыдущие ошибки
     this.clearValidationErrors();
 
-    // Отображаем ошибки для каждого поля
     Object.entries(fieldErrors).forEach(([fieldName, errors]) => {
       const field = this.element?.querySelector(
         `[name="${fieldName}"]`
@@ -74,14 +69,12 @@ export class RegistrationPage extends Block {
         errorElement.style.fontSize = "12px";
         errorElement.style.marginTop = "5px";
 
-        // Вставляем ошибку после поля
         field.parentElement?.appendChild(errorElement);
       }
     });
   }
 
   private clearValidationErrors() {
-    // Удаляем все предыдущие ошибки валидации
     const errorElements = this.element?.querySelectorAll(".validation-error");
     errorElements?.forEach((element) => element.remove());
   }

@@ -24,4 +24,5 @@ export default defineConfig({
     open: "/",
     host: true,
   },
+  base: "./",
 });

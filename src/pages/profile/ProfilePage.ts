@@ -8,7 +8,6 @@ import { iconTemplate } from "../../components/icon/iconTebplate";
 import { Validator, ValidationResult } from "../../services/Validator";
 import { chatAPI } from "../../services/api";
 
-// Регистрируем частичные шаблоны
 Handlebars.registerPartial("formInputGroup", formInputGroupTemplate);
 Handlebars.registerPartial("formInput", formInputTemplate);
 Handlebars.registerPartial("btn", buttonTemplate);
@@ -33,6 +32,7 @@ interface ProfilePageProps {
 export class ProfilePage extends Block {
   private user: UserData;
   // private isPasswordModalOpen: boolean = false;
+  private avatarUploadHandler = (e: Event) => this.handleAvatarUpload(e);
 
   constructor(props: ProfilePageProps) {
     super("div", {
@@ -52,6 +52,21 @@ export class ProfilePage extends Block {
 
   componentDidMount() {
     this.loadUserData();
+    this.setupAvatarUpload();
+  }
+
+  componentDidUpdate() {
+    this.setupAvatarUpload();
+  }
+
+  private setupAvatarUpload() {
+    const fileInput = this.element?.querySelector(
+      "#avatarUpload"
+    ) as HTMLInputElement;
+    if (fileInput) {
+      fileInput.removeEventListener("change", this.avatarUploadHandler);
+      fileInput.addEventListener("change", this.avatarUploadHandler);
+    }
   }
   private async loadUserData() {
     try {
@@ -60,9 +75,12 @@ export class ProfilePage extends Block {
       this.user = userData;
       this.setProps({ user: userData });
 
-      // Принудительно перерендериваем компонент
+      if (userData.avatar) {
+        this.updateAvatarInDOM(userData.avatar);
+      }
+
       this.eventBus.emit(Block.EVENTS.FLOW_RENDER);
-    } catch (error) {
+    } catch {
       alert("Не удалось загрузить данные профиля");
     }
   }
@@ -88,7 +106,6 @@ export class ProfilePage extends Block {
     const phone = String(formData.get("phone") || "").trim();
     const display_name = String(formData.get("display_name") || "").trim();
 
-    // Сравниваем с текущими данными пользователя
     if (email && email !== this.user.email) data.email = email;
     if (login && login !== this.user.login) data.login = login;
     if (first_name && first_name !== this.user.first_name)
@@ -99,7 +116,6 @@ export class ProfilePage extends Block {
     if (display_name && display_name !== (this.user.display_name || ""))
       data.display_name = display_name;
 
-    // Отправляем все поля, так как API может требовать их
     data.email = email;
     data.login = login;
     data.first_name = first_name;
@@ -111,7 +127,6 @@ export class ProfilePage extends Block {
       return;
     }
 
-    // Валидация формы профиля
     const validationResult: ValidationResult = Validator.validateForm(data);
 
     if (!validationResult.isValid) {
@@ -126,7 +141,7 @@ export class ProfilePage extends Block {
       this.setProps({ user: this.user });
 
       alert("Профиль обновлен!");
-    } catch (error) {
+    } catch {
       alert("Ошибка при обновлении профиля");
     }
   }
@@ -140,7 +155,6 @@ export class ProfilePage extends Block {
       confirmNewPassword: String(formData.get("confirmNewPassword") || ""),
     };
 
-    // Простая валидация паролей
     if (data.newPassword !== data.confirmNewPassword) {
       alert("Новые пароли не совпадают!");
       return;
@@ -156,7 +170,7 @@ export class ProfilePage extends Block {
 
       alert("Пароль изменен!");
       this.closePasswordModal();
-    } catch (error) {
+    } catch {
       alert("Ошибка при смене пароля");
     }
   }
@@ -178,8 +192,17 @@ export class ProfilePage extends Block {
       this.logout();
     } else if (target.closest("#avatarUpload")) {
       this.handleAvatarUpload(e);
+    } else if (
+      target.closest(".avatar-wrapper") ||
+      target.closest(".avatar-overlay")
+    ) {
+      const fileInput = this.element?.querySelector(
+        "#avatarUpload"
+      ) as HTMLInputElement;
+      if (fileInput) {
+        fileInput.click();
+      }
     } else if (target.id === "passwordModal") {
-      // Закрываем модальное окно при клике на фон
 
       this.closePasswordModal();
     }
@@ -204,23 +227,100 @@ export class ProfilePage extends Block {
   }
 
   private async logout() {
+    await(window as any).router.logout();
+  }
+
+  private async handleAvatarUpload(e: Event) {
+    const target = e.target as HTMLInputElement;
+    const file = target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    const validationResult = this.validateAvatarFile(file);
+    if (!validationResult.isValid) {
+      alert(validationResult.error);
+      target.value = ""; // Очищаем input
+      return;
+    }
+
+    // Показываем предварительный просмотр
+    this.showAvatarPreview(file);
+
     try {
-      await chatAPI.logout();
-      // any используется для доступа к глобальному роутеру
-      (window as any).router.navigate("/");
-    } catch (error) {
-      // В случае ошибки все равно перенаправляем на логин
-      // any используется для доступа к глобальному роутеру
-      (window as any).router.navigate("/");
+      // Загружаем аватар на сервер
+      const response = await chatAPI.uploadAvatar(file);
+
+      this.user = { ...this.user, ...response };
+      this.setProps({ user: this.user });
+
+      this.updateAvatarInDOM(response.avatar);
+
+      this.eventBus.emit(Block.EVENTS.FLOW_RENDER);
+
+      alert("Аватар успешно загружен!");
+    } catch {
+      alert("Ошибка при загрузке аватара");
+      // Восстанавливаем предыдущий аватар
+      this.eventBus.emit(Block.EVENTS.FLOW_RENDER);
     }
   }
 
-  private handleAvatarUpload(e: Event) {
-    const target = e.target as HTMLInputElement;
-    const file = target.files?.[0];
-    if (file) {
-      // Здесь будет загрузка аватара на сервер
-      alert("Аватар загружен!");
+  private validateAvatarFile(file: File): { isValid: boolean; error?: string } {
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
+    if (!allowedTypes.includes(file.type)) {
+      return {
+        isValid: false,
+        error:
+          "Неподдерживаемый формат файла. Разрешены только JPG, PNG и GIF.",
+      };
+    }
+
+    const maxSize = 5 * 1024 * 1024; // 5 МБ в байтах
+    if (file.size > maxSize) {
+      return {
+        isValid: false,
+        error: "Размер файла не должен превышать 5 МБ.",
+      };
+    }
+
+    const minSize = 1024; // 1 КБ в байтах
+    if (file.size < minSize) {
+      return {
+        isValid: false,
+        error: "Размер файла должен быть не менее 1 КБ.",
+      };
+    }
+
+    return { isValid: true };
+  }
+
+  private showAvatarPreview(file: File) {
+    const reader = new (window as any).FileReader();
+    reader.onload = (e: any) => {
+      const result = e.target?.result as string;
+      if (result) {
+        this.user.avatar = result;
+        this.eventBus.emit(Block.EVENTS.FLOW_RENDER);
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
+  private updateAvatarInDOM(avatarUrl: string) {
+    const fullAvatarUrl = avatarUrl.startsWith("http")
+      ? avatarUrl
+      : `https://ya-praktikum.tech/api/v2/resources${avatarUrl}`;
+
+    this.user.avatar = fullAvatarUrl;
+
+    const avatarImg = this.element?.querySelector(
+      ".avatar-image"
+    ) as HTMLImageElement;
+    if (avatarImg) {
+      avatarImg.src = fullAvatarUrl;
+      avatarImg.alt = "Аватар";
     }
   }
 
@@ -228,7 +328,6 @@ export class ProfilePage extends Block {
     // Очищаем предыдущие ошибки
     this.clearValidationErrors();
 
-    // Отображаем ошибки для каждого поля
     Object.entries(fieldErrors).forEach(([fieldName, errors]) => {
       const field = this.element?.querySelector(
         `[name="${fieldName}"]`

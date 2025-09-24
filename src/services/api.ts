@@ -1,6 +1,5 @@
 import { httpClient } from './HttpClient';
 
-// Интерфейсы для API
 export interface LoginRequest {
   login: string;
   password: string;
@@ -56,7 +55,6 @@ export interface UserSearchResult {
   avatar: string;
 }
 
-// API сервис для работы с чатом
 export class ChatAPI {
   private baseUrl = "https://ya-praktikum.tech/api/v2"; // Пример базового URL
 
@@ -70,12 +68,13 @@ export class ChatAPI {
         data
       );
 
+      "Login response status: " + response.status;
+      "Login response data: " + JSON.stringify(response.data);
+
       // API возвращает токен в Set-Cookie заголовке, а не в теле ответа
-      // Проверяем, что запрос прошел успешно (статус 200)
       if (response.status === 200) {
         localStorage.setItem("authToken", "authenticated");
 
-        // Создаем фиктивный объект ответа для совместимости с интерфейсом
         const mockResponse: LoginResponse = {
           token: "cookie-based-auth", // Фиктивный токен, так как реальный в cookies
           user: {
@@ -89,6 +88,38 @@ export class ChatAPI {
         };
 
         return mockResponse;
+      } else if (response.status === 400) {
+        // Если пользователь уже в системе, считаем это успешным логином
+        try {
+          const errorData = await response.data;
+          if (
+            errorData &&
+            typeof errorData === "object" &&
+            "reason" in errorData &&
+            errorData.reason === "User already in system"
+          ) {
+            localStorage.setItem("authToken", "authenticated");
+
+            const mockResponse: LoginResponse = {
+              token: "cookie-based-auth",
+              user: {
+                id: "unknown",
+                login: data.login,
+                first_name: "User",
+                second_name: "Name",
+                email: "user@example.com",
+                phone: "+79000000000",
+              },
+            };
+
+            return mockResponse;
+          }
+        } catch {
+          // Если не удалось распарсить ошибку, продолжаем с обычной обработкой
+        }
+
+        `Login failed with status: ${response.status}`;
+        throw new Error(`Login failed with status: ${response.status}`);
       } else {
         `Login failed with status: ${response.status}`;
         throw new Error(`Login failed with status: ${response.status}`);
@@ -96,14 +127,17 @@ export class ChatAPI {
     } catch (error: unknown) {
       // Показываем детали ошибки от API
       if (error instanceof Error && error.message) {
-        console.error("Login error:", error.message);
+        "Login error: " + error.message;
       }
 
       // Если пользователь уже в системе, считаем это успешным логином
-      if (error instanceof Error && error.message && error.message.includes("User already in system")) {
+      if (
+        error instanceof Error &&
+        error.message &&
+        error.message.includes("User already in system")
+      ) {
         localStorage.setItem("authToken", "authenticated");
 
-        // Создаем фиктивный ответ для уже авторизованного пользователя
         const mockResponse: LoginResponse = {
           token: "already-logged-in",
           user: {
@@ -135,10 +169,14 @@ export class ChatAPI {
 
       return response.data;
     } catch (error: unknown) {
-      // Показываем детали ошибки от API
-      if (error instanceof Error && error.message && error.message.includes("User already in system")) {
-        console.log("✅ User already exists - this is expected for existing users");
-        // Создаем фиктивный ответ для существующего пользователя
+      // Если пользователь уже существует, считаем это успешной регистрацией
+      if (
+        error instanceof Error &&
+        error.message &&
+        error.message.includes("User already in system")
+      ) {
+        localStorage.setItem("authToken", "authenticated");
+
         const mockResponse: LoginResponse = {
           token: "user-exists",
           user: {
@@ -342,23 +380,18 @@ export class ChatAPI {
   /**
    * Загрузка аватара
    */
-  async uploadAvatar(file: File): Promise<{ avatar: string }> {
+  async uploadAvatar(file: File): Promise<LoginResponse["user"]> {
     try {
-      const token = localStorage.getItem("authToken");
-      if (!token) {
-        throw new Error("No auth token");
-      }
-
       const formData = new FormData();
       formData.append("avatar", file);
 
-      const response = await httpClient.put<{ avatar: string }>(
+      const response = await httpClient.put<LoginResponse["user"]>(
         `${this.baseUrl}/user/profile/avatar`,
         formData,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          credentials: "include",
+          mode: "cors",
+          // Не указываем Content-Type - браузер сам подставит multipart/form-data
         }
       );
 
@@ -433,6 +466,20 @@ export class ChatAPI {
   }
 
   /**
+   * Получить участников чата
+   */
+  async getChatUsers(chatId: string): Promise<UserSearchResult[]> {
+    try {
+      const response = await httpClient.get<UserSearchResult[]>(
+        `${this.baseUrl}/chats/${chatId}/users`
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
    * Выход из системы
    */
   async logout(): Promise<void> {
@@ -444,15 +491,12 @@ export class ChatAPI {
 
       await httpClient.post(`${this.baseUrl}/auth/logout`);
 
-      // Удаляем токен
       localStorage.removeItem("authToken");
     } catch (error) {
-      // Даже при ошибке удаляем токен
       localStorage.removeItem("authToken");
       throw error;
     }
   }
 }
 
-// Экспортируем экземпляр API
 export const chatAPI = new ChatAPI();

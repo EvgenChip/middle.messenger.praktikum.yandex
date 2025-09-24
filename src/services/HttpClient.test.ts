@@ -205,5 +205,4 @@ export class HttpClientDemo {
   }
 }
 
-// Экспортируем для использования в других файлах
 export default HttpClientDemo;

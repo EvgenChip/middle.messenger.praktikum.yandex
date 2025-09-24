@@ -8,7 +8,6 @@ import { iconTemplate } from "../../components/icon/iconTebplate";
 import { Validator, ValidationResult } from "../../services/Validator";
 import { chatAPI } from "../../services/api";
 
-// Регистрируем частичные шаблоны
 Handlebars.registerPartial("formInputGroup", formInputGroupTemplate);
 Handlebars.registerPartial("formInput", formInputTemplate);
 Handlebars.registerPartial("btn", buttonTemplate);
@@ -37,7 +36,6 @@ export class LoginPage extends Block {
       password: String(formData.get("password") || ""),
     };
 
-    // Валидация формы входа
     const validationResult: ValidationResult = Validator.validateForm(data);
 
     if (!validationResult.isValid) {
@@ -48,7 +46,6 @@ export class LoginPage extends Block {
     try {
       await chatAPI.login(data);
 
-      // any используется для доступа к глобальному роутеру
       (window as any).router.navigate("/messenger");
     } catch (error) {
       this.showApiError("Ошибка входа. Проверьте логин и пароль.");
@@ -74,12 +71,10 @@ export class LoginPage extends Block {
   }
 
   private loginWithGoogle() {
-    // Здесь будет интеграция с Google OAuth
     alert("Интеграция с Google в разработке");
   }
 
   private loginWithGithub() {
-    // Здесь будет интеграция с GitHub OAuth
     alert("Интеграция с GitHub в разработке");
   }
 
@@ -87,7 +82,6 @@ export class LoginPage extends Block {
     // Очищаем предыдущие ошибки
     this.clearValidationErrors();
 
-    // Отображаем ошибки для каждого поля
     Object.entries(fieldErrors).forEach(([fieldName, errors]) => {
       const field = this.element?.querySelector(
         `[name="${fieldName}"]`
@@ -123,7 +117,6 @@ export class LoginPage extends Block {
     errorElement.style.marginTop = "10px";
     errorElement.style.textAlign = "center";
 
-    // Вставляем ошибку в форму
     const form = this.element?.querySelector("#loginForm");
     if (form) {
       form.appendChild(errorElement);

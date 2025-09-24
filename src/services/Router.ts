@@ -8,7 +8,7 @@ import { ErrorPage } from "../pages/errorsPage/ErrorPage";
 
 export interface Route {
   path: string;
-  component: new (props?: any) => Block; // any используется для совместимости с разными типами props
+  component: new (props?: any) => Block;
   props?: Record<string, unknown>; // Props object with unknown values
 }
 
@@ -57,7 +57,7 @@ export class Router {
       },
       {
         path: "/messenger",
-        component: ErrorPage, // Заглушка для динамической загрузки
+        component: ErrorPage,
         props: {},
       },
       {
@@ -124,29 +124,52 @@ export class Router {
   }
 
   private async handleRoute(path: string) {
-    // Проверяем авторизацию для защищенных маршрутов
+    // Страницы ошибок не требуют проверки авторизации
+    const errorPages = ["/404", "/500"];
+    if (errorPages.includes(path)) {
+      this.renderRoute(path);
+      return;
+    }
+
     const protectedRoutes = ["/messenger", "/settings"];
     const isProtected = protectedRoutes.some((route) => path.startsWith(route));
-    // Для этого API авторизация происходит через cookies, а не localStorage
-    const isAuthenticated =
-      document.cookie.includes("authCookie") ||
-      !!localStorage.getItem("authToken");
+
+    const isAuthenticated = await this.checkAuthentication();
 
     if (isProtected && !isAuthenticated) {
       this.navigate("/");
       return;
     }
 
-    // Если пользователь авторизован и пытается зайти на логин/регистрацию, перенаправляем в чат
     if (isAuthenticated && (path === "/" || path === "/sign-up")) {
       this.navigate("/messenger");
       return;
     }
 
+    this.renderRoute(path);
+  }
+
+  private async checkAuthentication(): Promise<boolean> {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        return false;
+      }
+
+      const { chatAPI } = await import("./api");
+      await chatAPI.getCurrentUser();
+      return true;
+    } catch {
+      // Если ошибка авторизации, очищаем токен
+      localStorage.removeItem("authToken");
+      return false;
+    }
+  }
+
+  private async renderRoute(path: string) {
     // Ищем маршрут
     let route = this.routes.find((r) => r.path === path);
 
-    // Если точного совпадения нет, ищем частичное
     if (!route) {
       route = this.routes.find((r) => path.startsWith(r.path));
     }
@@ -156,29 +179,33 @@ export class Router {
       route = this.routes.find((r) => r.path === "/404")!;
     }
 
-    // Специальная обработка для мессенджера (динамический импорт)
     if (path.includes("/messenger")) {
       try {
         const { ChatPage } = await import("../pages/chat/ChatPage");
         const chatPage = new ChatPage();
         render("#app", chatPage);
         return;
-      } catch (error) {
+      } catch {
         // В случае ошибки показываем 500
         route = this.routes.find((r) => r.path === "/500")!;
       }
     }
 
-    // Рендерим компонент
     if (route && route.component) {
       const component = new route.component(route.props);
       render("#app", component);
-      // this.currentRoute = route;
     }
   }
 
-  public start() {
-    // Обрабатываем текущий маршрут при запуске
-    this.handleRoute(window.location.pathname);
+  public async start() {
+    await this.handleRoute(window.location.pathname);
+  }
+
+  public async logout() {
+    try {
+      const { chatAPI } = await import("./api");
+      await chatAPI.logout();
+    } catch {}
+    this.navigate("/");
   }
 }

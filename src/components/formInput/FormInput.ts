@@ -55,7 +55,7 @@ export class FormInput extends Block {
   }
 
   private handleFocus(_e: Event) {
-    // Скрываем ошибку при фокусе
+    
     this.updateErrorDisplay(null);
   }
 
@@ -105,7 +105,7 @@ export class FormInput extends Block {
   }
 
   componentDidMount() {
-    // Сохраняем ссылки на элементы после рендера
+    
     this.inputElement = this.element.querySelector('.form-input') as HTMLInputElement;
     this.errorElement = this.element.querySelector('.form-error') as HTMLElement;
   }

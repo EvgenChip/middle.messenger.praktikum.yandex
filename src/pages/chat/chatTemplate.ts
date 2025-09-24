@@ -4,7 +4,10 @@ export const chatTemplate = `
   <div class="chat-list">
     <div class="chat-list-header">
       <h2>Чаты</h2>
-      <button class="new-chat-button">{{> icon name="plus"}}</button>
+      <button class="btn btn--primary" data-action="openCreateChatModal">
+        {{> icon name="plus"}}
+        СОЗДАТЬ ЧАТ
+      </button>
     </div>
 
     <div class="chat-items">
@@ -26,11 +29,17 @@ export const chatTemplate = `
   <!-- Блок переписки -->
   <div class="chat-conversation">
     {{#if activeChat}}
-      {{> conversationHeader
-        avatar=activeChat.avatar
-        name=activeChat.name
-        status=activeChat.status
-      }}
+      <div class="conversation-header">
+        {{> conversationHeader
+          avatar=activeChat.avatar
+          name=activeChat.name
+          status=activeChat.status
+        }}
+        <button class="btn btn--management" data-action="openUserManagementModal">
+          {{> icon name="settings"}}
+          УПРАВЛЕНИЕ
+        </button>
+      </div>
 
       <div class="messages-container">
         {{#each messages}}
@@ -82,11 +91,93 @@ export const chatTemplate = `
         </div>
       </div>
       <div class="modal-actions">
-        <button class="btn" type="submit">
+        <button class="btn btn--primary" type="submit">
+          {{> icon name="plus"}}
           СОЗДАТЬ
-          <span class="btn__icon">plus</span>
         </button>
-        <button class="btn" type="button" data-action="closeCreateChatModal">
+        <button class="btn btn--warning" type="button" data-action="closeCreateChatModal">
+          {{> icon name="close"}}
+          ОТМЕНА
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Модальное окно управления участниками чата -->
+<div class="modal" id="userManagementModal">
+  <div class="modal-content">
+    <h2 class="modal-title">УПРАВЛЕНИЕ УЧАСТНИКАМИ</h2>
+
+    <div class="participants-section">
+      <div class="section-header">
+        <h3>Участники чата</h3>
+        <button class="btn btn--secondary" data-action="openAddUserModal">
+          {{> icon name="plus"}}
+          Добавить пользователя
+        </button>
+      </div>
+      <div id="participantsList" class="participants-list">
+        <!-- Список участников будет загружен динамически -->
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn--warning" type="button" data-action="closeUserManagementModal">
+        {{> icon name="close"}}
+        ЗАКРЫТЬ
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Модальное окно добавления пользователей -->
+<div class="modal" id="addUserModal">
+  <div class="modal-content">
+    <h2 class="modal-title">ДОБАВИТЬ ПОЛЬЗОВАТЕЛЯ</h2>
+
+    <form id="searchUserForm">
+      <div class="input-group">
+        <label class="input-group__label" for="userLogin">
+          ПОИСК ПО ЛОГИНУ
+          <span class="input-group__required">*</span>
+        </label>
+        <input
+          class="input-group__input"
+          type="text"
+          id="userLogin"
+          name="userLogin"
+          placeholder="Введите логин пользователя"
+          required
+        >
+        <div class="input-group__icon">
+          <svg class="icon icon--search" viewBox="0 0 24 24">
+            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path>
+          </svg>
+        </div>
+      </div>
+      <button class="btn btn--primary" type="submit">
+        {{> icon name="search"}}
+        ПОИСК
+      </button>
+    </form>
+
+    <div id="searchResults" class="search-results">
+      <!-- Результаты поиска будут загружены динамически -->
+    </div>
+
+    <form id="addUserForm" style="display: none;">
+      <div class="selected-users">
+        <h3>Выбранные пользователи:</h3>
+        <div id="selectedUsersList"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn--secondary" type="submit">
+          {{> icon name="plus"}}
+          ДОБАВИТЬ В ЧАТ
+        </button>
+        <button class="btn btn--warning" type="button" data-action="closeAddUserModal">
+          {{> icon name="close"}}
           ОТМЕНА
         </button>
       </div>

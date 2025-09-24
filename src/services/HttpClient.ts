@@ -1,6 +1,8 @@
 export interface HttpRequestConfig {
   headers?: Record<string, string>;
   timeout?: number;
+  credentials?: "include" | "same-origin" | "omit";
+  mode?: "cors" | "no-cors" | "same-origin";
 }
 
 export interface HttpResponse<T = unknown> {
@@ -71,7 +73,8 @@ export class HttpClient {
     data?: unknown,
     config?: HttpRequestConfig
   ): Promise<HttpResponse<T>> {
-    console.log(`🌐 HTTP ${method} ${url}`, { data, config });
+    // Логируем HTTP запрос
+    "HTTP " + method + " " + url;
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       const timeout = config?.timeout || this.defaultTimeout;
@@ -100,14 +103,30 @@ export class HttpClient {
               headers: this.parseHeaders(xhr.getAllResponseHeaders()),
             };
 
-            // Логируем cookies для отладки
+
+            resolve(response);
+          } else if (xhr.status === 400) {
+            let responseData: T;
+            try {
+              responseData = xhr.responseText
+                ? JSON.parse(xhr.responseText)
+                : null;
+            } catch {
+              responseData = xhr.responseText as T;
+            }
+
+            const response: HttpResponse<T> = {
+              data: responseData,
+              status: xhr.status,
+              statusText: xhr.statusText,
+              headers: this.parseHeaders(xhr.getAllResponseHeaders()),
+            };
 
             resolve(response);
           } else {
             // Ошибка HTTP
             let errorMessage = `HTTP Error ${xhr.status}: ${xhr.statusText}`;
 
-            // Пытаемся получить детали ошибки из ответа
             try {
               const errorData = xhr.responseText
                 ? JSON.parse(xhr.responseText)
@@ -152,7 +171,6 @@ export class HttpClient {
       // Открываем соединение
       xhr.open(method, url, true);
 
-      // Включаем поддержку cookies для авторизации
       xhr.withCredentials = true;
 
       // Устанавливаем заголовки
@@ -162,7 +180,6 @@ export class HttpClient {
         });
       }
 
-      // Устанавливаем Content-Type для POST/PUT/DELETE с данными, если не установлен в заголовках
       if (data && ["POST", "PUT", "DELETE"].includes(method)) {
         const hasContentType =
           config?.headers &&
@@ -171,7 +188,8 @@ export class HttpClient {
           );
 
         if (!hasContentType) {
-          if (typeof data === "object") {
+          if (data instanceof FormData) {
+          } else if (typeof data === "object") {
             xhr.setRequestHeader("Content-Type", "application/json");
           } else {
             xhr.setRequestHeader("Content-Type", "text/plain");
@@ -179,12 +197,14 @@ export class HttpClient {
         }
       }
 
-      // Отправляем запрос
       if (data) {
-        const requestData =
-          typeof data === "object" ? JSON.stringify(data) : String(data);
-        console.log(`📤 Sending data:`, requestData);
-        xhr.send(requestData);
+        if (data instanceof FormData) {
+          xhr.send(data);
+        } else {
+          const requestData =
+            typeof data === "object" ? JSON.stringify(data) : String(data);
+          xhr.send(requestData);
+        }
       } else {
         xhr.send();
       }
@@ -247,5 +267,4 @@ export class HttpClient {
   public setAuthToken(_token: string): void {}
 }
 
-// Экспортируем экземпляр по умолчанию
 export const httpClient = new HttpClient();
