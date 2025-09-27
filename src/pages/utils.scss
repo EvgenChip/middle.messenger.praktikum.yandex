@@ -8,15 +8,19 @@ $color-neon-green: #2ecc71;
 $color-neon-orange: #ff8c00;
 $color-neon-orange-dark:  color.mix(rgba(0, 0, 0, 1), $color-neon-orange, 10%);
 
-$color-dark-bg: #0a0a12;          // Основной темный фон
+$color-dark-bg: #0a0a12;
 $color-darker-bg: #050508;        // Акцентный темный
-$color-neon-blue: #0ff0fc;        // Неоновый синий
-$color-neon-pink: #ff2a6d;        // Неоновый розовый
-$color-neon-purple: #9d00ff;      // Неоновый фиолетовый
+$color-neon-blue: #0ff0fc;
+$color-neon-pink: #ff2a6d;
+$color-neon-purple: #9d00ff;
 $color-error: #ff3860;            // Цвет ошибок
 $color-success: #2ecc71;          // Цвет успеха
-$color-warning: #f39c12;          // Цвет предупреждения
-$color-neon-orange: #ff8c00; // Яркий неоново-оранжевый
+$color-warning: #f39c12;
+$color-neon-orange: #ff8c00;
+
+// Цвета текста
+$color-text: #ffffff;             // Основной цвет текста
+$color-text-secondary: #cccccc;   // Вторичный цвет текста
 
 $color-neon-blue-dark: color.mix(#000, $color-neon-blue, 15%);
 $color-neon-pink-dark: color.adjust($color-neon-pink, $lightness: -10%);
@@ -68,36 +72,34 @@ $color-neon-purple-dark: color.scale($color-neon-purple, $lightness: -15%);
 // ======================
 $font-main: 'Rajdhani', sans-serif;                     // Основной шрифт
 $font-heading: 'Orbitron', sans-serif;                  // Заголовки
-$font-monospace: 'Courier New', monospace;              // Код/консоль
-$base-font-size: 16px;                                  // Базовый размер
+$font-monospace: 'Courier New', monospace;
+$base-font-size: 16px;
 
 // ======================
-//  Тени и свечения
 // ======================
 $glow-blue: 0 0 10px rgba($color-neon-blue, 0.5);      // Свечение синим
-$glow-pink: 0 0 10px rgba($color-neon-pink, 0.5);      // Свечение розовым
-$glow-purple: 0 0 10px rgba($color-neon-purple, 0.5);  // Свечение фиолетовым
+$glow-pink: 0 0 10px rgba($color-neon-pink, 0.5);
+$glow-purple: 0 0 10px rgba($color-neon-purple, 0.5);
 $text-glow: 0 0 8px currentColor;                      // Свечение текста
 
 // ======================
 //  Размеры и отступы
 // ======================
-$border-radius: 4px;                   // Базовый радиус скругления
-$spacing-unit: 1rem;                   // Базовый отступ
-$max-content-width: 1200px;            // Макс. ширина контента
-$input-height: 48px;                   // Высота полей ввода
+$border-radius: 4px;
+$spacing-unit: 1rem;
+$max-content-width: 1200px;
+$input-height: 48px;
 
 // ======================
 //  Анимации
 // ======================
 $transition-duration: 0.3s;            // Длительность переходов
-$transition-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94); // Кривая анимации
+$transition-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
 // ======================
 //  Миксины
 // ======================
 
-// Эффект глитча для текста
 @mixin glitch-effect($color: $color-neon-blue, $color2: $color-neon-pink, $color3: $color-neon-purple) {
   position: relative;
 
@@ -127,7 +129,6 @@ $transition-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94); // Кривая ани
   }
 }
 
-// Неоновый текст
 @mixin neon-text($color, $intensity: 0.8) {
   color: $color;
   text-shadow: 0 0 5px rgba($color, $intensity);
@@ -137,7 +138,6 @@ $transition-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94); // Кривая ани
   }
 }
 
-// Сканирующая линия (CRT эффект)
 @mixin scanline($color: rgba($color-neon-blue, 0.05), $speed: 4s) {
   position: relative;
   overflow: hidden;
@@ -162,7 +162,6 @@ $transition-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94); // Кривая ани
   }
 }
 
-// Пульсация элемента
 @mixin pulse($color: $color-neon-blue, $size: 10px) {
   animation: pulse-anim 2s infinite;
 

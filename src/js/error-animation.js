@@ -13,4 +13,3 @@ export function render(query, block) {
 const but = new ButtonTest();
 
 return render(".app", but);
-console.log(render(".app", but));

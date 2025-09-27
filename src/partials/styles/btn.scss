@@ -4,7 +4,6 @@ $neon-pink: #ff2a6d;
 $neon-blue: #0ff0fc;
 $glow-intensity: 0.5;
 
-// Базовые стили
 .btn {
   position: relative;
   width: 100%;
@@ -24,7 +23,6 @@ $glow-intensity: 0.5;
     0 0 15px rgba($neon-purple, $glow-intensity),
     0 0 5px rgba(white, 0.1) inset;
 
-  // Эффект свечения при наведении
   &:hover {
     transform: translateY(-2px);
     box-shadow:
@@ -34,19 +32,16 @@ $glow-intensity: 0.5;
     text-shadow: 0 0 5px white;
   }
 
-  // Активное состояние
   &:active {
     transform: translateY(1px);
   }
 
-  // Иконка внутри кнопки
   &__icon {
     margin-left: 10px;
     display: inline-block;
     transition: transform 0.3s;
   }
 
-  // Модификатор для пульсации
   &--pulse {
     animation: pulse 2s infinite;
 
@@ -55,7 +50,6 @@ $glow-intensity: 0.5;
     }
   }
 
-  // Модификатор для disabled состояния
   &[disabled] {
     background: gray;
     box-shadow: none;
@@ -68,7 +62,6 @@ $glow-intensity: 0.5;
     }
   }
 
-  // Эффект "неонового свечения" вокруг кнопки
   &::after {
     content: '';
     position: absolute;

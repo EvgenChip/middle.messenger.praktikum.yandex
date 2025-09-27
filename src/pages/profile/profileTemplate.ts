@@ -17,7 +17,7 @@ export const profileTemplate = `
       </div>
     </div>
 
-    <form class="profile-form" id="profileForm">
+    <form class="profile-form" id="profileForm" onsubmit="return false;">
       {{> formInputGroup
         id="email"
         label="E-MAIL"
@@ -43,7 +43,7 @@ export const profileTemplate = `
         label="ИМЯ"
         type="text"
         name="first_name"
-        value=user.firstName
+        value=user.first_name
         required=true
         icon="user"
       }}
@@ -52,8 +52,8 @@ export const profileTemplate = `
         id="lastName"
         label="ФАМИЛИЯ"
         type="text"
-        name="last_name"
-        value=user.lastName
+        name="second_name"
+        value=user.second_name
         required=true
         icon="user"
       }}
@@ -63,7 +63,7 @@ export const profileTemplate = `
         label="ИМЯ В ЧАТЕ"
         type="text"
         name="display_name"
-        value=user.displayName
+        value=user.display_name
         required=true
         icon="message"
       }}
@@ -79,7 +79,7 @@ export const profileTemplate = `
       }}
 
       <div class="form-actions">
-        {{> btn text="СОХРАНИТЬ" type="submit" pulse=true icon="save" }}
+        {{> btn text="СОХРАНИТЬ" type="submit" pulse=true icon="save" data-action="submitProfile" }}
       </div>
     </form>
 
@@ -88,58 +88,57 @@ export const profileTemplate = `
         text="ИЗМЕНИТЬ ПАРОЛЬ"
         variant="outline"
         icon="lock"
-        onClick="openPasswordModal()"
+        data-action="openPasswordModal"
       }}
 
       {{> btn
         text="ВЫЙТИ"
         variant="danger"
         icon="logout"
-        onClick="logout()"
+        data-action="logout"
       }}
     </div>
   </div>
-</div>
 
-<!-- Модальное окно смены пароля -->
-<div class="modal" id="passwordModal" style="display: none;">
-  <div class="modal-content">
-    <h2 class="modal-title">СМЕНА ПАРОЛЯ</h2>
+  <!-- Модальное окно смены пароля -->
+  <div class="modal" id="passwordModal">
+    <div class="modal-content">
+      <h2 class="modal-title">СМЕНА ПАРОЛЯ</h2>
 
-    <form id="passwordForm">
-      {{> formInputGroup
-        id="oldPassword"
-        label="ТЕКУЩИЙ ПАРОЛЬ"
-        type="password"
-        name="oldPassword"
-        required=true
-        icon="lock"
-      }}
+      <form id="passwordForm">
+        {{> formInputGroup
+          id="oldPassword"
+          label="ТЕКУЩИЙ ПАРОЛЬ"
+          type="password"
+          name="oldPassword"
+          required=true
+          icon="lock"
+        }}
 
-      {{> formInputGroup
-        id="newPassword"
-        label="НОВЫЙ ПАРОЛЬ"
-        type="password"
-        name="newPassword"
-        required=true
-        icon="lock"
-      }}
+        {{> formInputGroup
+          id="newPassword"
+          label="НОВЫЙ ПАРОЛЬ"
+          type="password"
+          name="newPassword"
+          required=true
+          icon="lock"
+        }}
 
-      {{> formInputGroup
-        id="confirmNewPassword"
-        label="ПОДТВЕРДИТЕ ПАРОЛЬ"
-        type="password"
-        name="confirmNewPassword"
-        required=true
-        icon="lock"
-      }}
+        {{> formInputGroup
+          id="confirmNewPassword"
+          label="ПОДТВЕРДИТЕ ПАРОЛЬ"
+          type="password"
+          name="confirmNewPassword"
+          required=true
+          icon="lock"
+        }}
 
-      <div class="modal-actions">
-        {{> btn text="СОХРАНИТЬ" type="submit" icon="save" }}
-        {{> btn text="ОТМЕНА" type="button" variant="outline" onClick="closePasswordModal()" }}
-      </div>
-    </form>
+        <div class="modal-actions">
+          {{> btn text="СОХРАНИТЬ" type="submit" icon="save" }}
+          {{> btn text="ОТМЕНА" type="button" variant="outline" data-action="closePasswordModal" }}
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 `;
-

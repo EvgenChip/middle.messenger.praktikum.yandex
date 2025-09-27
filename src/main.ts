@@ -22,13 +22,14 @@ import { httpClient } from "./services/HttpClient";
 // Инициализируем роутер
 const router = new Router();
 
-// Делаем роутер доступным глобально для страниц ошибок
 (window as any).router = router;
 
-// Делаем HTTP клиент доступным глобально для тестирования
 (window as any).httpClient = httpClient;
 
+import { webSocketService } from "./services/WebSocketService";
+(window as any).webSocketService = webSocketService;
+
 // Запускаем роутер при загрузке страницы
-document.addEventListener("DOMContentLoaded", () => {
-  router.start();
+document.addEventListener("DOMContentLoaded", async () => {
+  await router.start();
 });

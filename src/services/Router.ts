@@ -1,4 +1,5 @@
 import { render } from "./render";
+import Block from "./Block";
 import { HomePage } from "../pages/homePage/HomePage";
 import { LoginPage } from "../pages/login/LoginPage";
 import { RegistrationPage } from "../pages/registration/RegistrationPage";
@@ -7,8 +8,8 @@ import { ErrorPage } from "../pages/errorsPage/ErrorPage";
 
 export interface Route {
   path: string;
-  component: any;
-  props?: any;
+  component: new (props?: any) => Block;
+  props?: Record<string, unknown>; // Props object with unknown values
 }
 
 export class Router {
@@ -24,22 +25,6 @@ export class Router {
     this.routes = [
       {
         path: "/",
-        component: HomePage,
-        props: {
-          title: "NEON-CHAT v3.1.2",
-          subtitle: "ДОБРО ПОЖАЛОВАТЬ В КИБЕРПРОСТРАНСТВО",
-        },
-      },
-      {
-        path: "/home",
-        component: HomePage,
-        props: {
-          title: "NEON-CHAT v3.1.2",
-          subtitle: "ДОБРО ПОЖАЛОВАТЬ В КИБЕРПРОСТРАНСТВО",
-        },
-      },
-      {
-        path: "/login",
         component: LoginPage,
         props: {
           title: "NEON-CHAT v3.1.2",
@@ -47,7 +32,7 @@ export class Router {
         },
       },
       {
-        path: "/registration",
+        path: "/sign-up",
         component: RegistrationPage,
         props: {
           title: "NEON-CHAT v3.1.2",
@@ -55,7 +40,7 @@ export class Router {
         },
       },
       {
-        path: "/profile",
+        path: "/settings",
         component: ProfilePage,
         props: {
           title: "ПРОФИЛЬ",
@@ -71,9 +56,17 @@ export class Router {
         },
       },
       {
-        path: "/chat",
-        component: null, // Будет загружаться динамически
+        path: "/messenger",
+        component: ErrorPage,
         props: {},
+      },
+      {
+        path: "/home",
+        component: HomePage,
+        props: {
+          title: "NEON-CHAT v3.1.2",
+          subtitle: "ДОБРО ПОЖАЛОВАТЬ В КИБЕРПРОСТРАНСТВО",
+        },
       },
       {
         path: "/404",
@@ -126,18 +119,57 @@ export class Router {
   }
 
   public navigate(path: string) {
-    // Обновляем URL без перезагрузки страницы
     window.history.pushState({}, "", path);
     this.handleRoute(path);
   }
 
   private async handleRoute(path: string) {
-    console.log("🔍 Navigating to:", path);
+    // Страницы ошибок не требуют проверки авторизации
+    const errorPages = ["/404", "/500"];
+    if (errorPages.includes(path)) {
+      this.renderRoute(path);
+      return;
+    }
 
+    const protectedRoutes = ["/messenger", "/settings"];
+    const isProtected = protectedRoutes.some((route) => path.startsWith(route));
+
+    const isAuthenticated = await this.checkAuthentication();
+
+    if (isProtected && !isAuthenticated) {
+      this.navigate("/");
+      return;
+    }
+
+    if (isAuthenticated && (path === "/" || path === "/sign-up")) {
+      this.navigate("/messenger");
+      return;
+    }
+
+    this.renderRoute(path);
+  }
+
+  private async checkAuthentication(): Promise<boolean> {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        return false;
+      }
+
+      const { chatAPI } = await import("./api");
+      await chatAPI.getCurrentUser();
+      return true;
+    } catch {
+      // Если ошибка авторизации, очищаем токен
+      localStorage.removeItem("authToken");
+      return false;
+    }
+  }
+
+  private async renderRoute(path: string) {
     // Ищем маршрут
     let route = this.routes.find((r) => r.path === path);
 
-    // Если точного совпадения нет, ищем частичное
     if (!route) {
       route = this.routes.find((r) => path.startsWith(r.path));
     }
@@ -147,30 +179,35 @@ export class Router {
       route = this.routes.find((r) => r.path === "/404")!;
     }
 
-    // Специальная обработка для чата (динамический импорт)
-    if (path.includes("/chat")) {
+    if (path.includes("/messenger")) {
       try {
         const { ChatPage } = await import("../pages/chat/ChatPage");
         const chatPage = new ChatPage();
         render("#app", chatPage);
         return;
-      } catch (error) {
-        console.error("Error importing ChatPage:", error);
+      } catch {
         // В случае ошибки показываем 500
         route = this.routes.find((r) => r.path === "/500")!;
       }
     }
 
-    // Рендерим компонент
     if (route && route.component) {
       const component = new route.component(route.props);
       render("#app", component);
-      // this.currentRoute = route;
     }
   }
 
-  public start() {
-    // Обрабатываем текущий маршрут при запуске
-    this.handleRoute(window.location.pathname);
+  public async start() {
+    await this.handleRoute(window.location.pathname);
+  }
+
+  public async logout() {
+    try {
+      const { chatAPI } = await import("./api");
+      await chatAPI.logout();
+    } catch {
+      // Игнорируем ошибки
+    }
+    this.navigate("/");
   }
 }

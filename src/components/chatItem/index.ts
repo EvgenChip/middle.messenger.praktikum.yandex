@@ -23,7 +23,6 @@ class ChatItem extends Block {
       ...props,
       events: {
         click: (e: Event) => {
-          // Не вызываем onClick при клике на кнопку удаления
           if (!(e.target as HTMLElement).closest('.delete-chat')) {
             props.onClick?.(e);
           }
@@ -31,7 +30,6 @@ class ChatItem extends Block {
       },
     });
 
-    // Добавляем обработчик удаления
     this.element.addEventListener('click', (e: Event) => {
       if ((e.target as HTMLElement).closest('.delete-chat')) {
         e.preventDefault();

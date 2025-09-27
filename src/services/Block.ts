@@ -2,9 +2,8 @@ import EventBus from "./EventBus.ts";
 import Handlebars from "handlebars";
 import { v4 as uuidv4 } from "uuid";
 
-
 // Регистрируем helper eq
-Handlebars.registerHelper('eq', function (a: any, b: any) {
+Handlebars.registerHelper("eq", function (a: any, b: any) {
   return a === b;
 });
 type EventBusType = {
@@ -12,7 +11,7 @@ type EventBusType = {
   emit: (event: string, ...args: unknown[]) => void;
 };
 
-interface BlockProps {
+export interface BlockProps {
   [key: string]: Block | object | (() => void) | string | boolean | undefined;
   _id: string | undefined;
 }
@@ -79,7 +78,6 @@ class Block {
     const lists: { [key: string]: Block[] } = {};
     const children: { [key: string]: Block } = {};
     const props: { [key: string]: string | boolean | void | object } = {};
-
     if (anyProps) {
       Object.keys(anyProps).forEach((key: string) => {
         if (anyProps[key] instanceof Block) {
@@ -166,7 +164,6 @@ class Block {
 
       stub.replaceWith(listContent.content);
     });
-    console.log("FRAGMENT", fragment.content);
     return fragment.content;
   }
 
@@ -174,9 +171,7 @@ class Block {
     this.componentDidMount();
   }
 
-  componentDidMount(oldProps?: BlockProps): void {
-    console.log("componentDidMount", oldProps);
-  }
+  componentDidMount(_oldProps?: BlockProps): void {}
 
   dispatchComponentDidMount(): void {
     this.eventBus.emit(Block.EVENTS.FLOW_CDM);
@@ -189,16 +184,13 @@ class Block {
     return oldProps !== newProps;
   }
 
-  componentDidUpdate(oldProps?: BlockProps, newProps?: BlockProps): boolean {
-    console.log(oldProps, newProps);
-    return true; // Реализуйте логику обновления
+  componentDidUpdate(_oldProps?: BlockProps, _newProps?: BlockProps): boolean {
+    return true;
   }
 
   setProps(nextProps?: Partial<BlockProps>): void {
-    // Используем Partial для частичного обновления свойств
     if (!nextProps) return;
     const { children, props, lists } = this.getChildren(nextProps);
-
     if (Object.values(children).length) {
       Object.assign(this.children, children);
     }
@@ -230,7 +222,6 @@ class Block {
   }
 
   getContent() {
-    console.log("ELEM", this?._element);
     return this?._element;
   }
 
