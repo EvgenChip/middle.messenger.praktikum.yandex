@@ -103,6 +103,8 @@ npm test
 - SPA роутинг
 - Оптимизация ресурсов
 
+**🌐 Демо:** [https://your-project.netlify.app](https://your-project.netlify.app)
+
 ## 📝 Лицензия
 
 Проект создан в рамках образовательной программы Яндекс.Практикум.
