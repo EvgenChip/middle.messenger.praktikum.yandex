@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"],
+      "description": "Context7 MCP server for accessing up-to-date documentation and code examples"
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "description": "Sequential Thinking MCP server for structured problem solving"
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@executeautomation/playwright-mcp-server"],
+      "description": "Playwright MCP server for browser automation and web scraping"
+    },
+    "playwright-cloudflare": {
+      "command": "npx",
+      "args": ["-y", "@cloudflare/playwright-mcp"],
+      "description": "Cloudflare Playwright MCP server for browser automation"
+    }
+  }
+}
