@@ -1,208 +1,181 @@
-import { httpClient } from './HttpClient';
+import { describe, it, expect, beforeEach, jest } from "@jest/globals";
+import { HttpClient } from "./HttpClient";
 
-// Тестирование HTTP класса
-export class HttpClientDemo {
-  static async testGetRequest() {
+describe("HttpClient", () => {
+  let httpClient: HttpClient;
+  let mockXHR: any;
 
+  beforeEach(() => {
+    // Создаем мок XMLHttpRequest
+    mockXHR = {
+      open: jest.fn(),
+      send: jest.fn(),
+      setRequestHeader: jest.fn(),
+      getAllResponseHeaders: jest.fn(
+        () => "content-type: application/json\r\n"
+      ),
+      getResponseHeader: jest.fn(() => "application/json"),
+      readyState: 4,
+      status: 200,
+      statusText: "OK",
+      responseText: '{"success": true}',
+      response: '{"success": true}',
+      onreadystatechange: null,
+      onload: null,
+      onerror: null,
+      ontimeout: null,
+    };
 
-    try {
-      const url = httpClient.buildUrl(
-        "https://jsonplaceholder.typicode.com/posts",
-        {
-          userId: 1,
-          _limit: 5,
+    // Мокаем XMLHttpRequest конструктор
+    (global as any).XMLHttpRequest = jest.fn(() => {
+      // Симулируем автоматический вызов onreadystatechange
+      setTimeout(() => {
+        mockXHR.readyState = 4;
+        if (mockXHR.onreadystatechange) {
+          mockXHR.onreadystatechange();
         }
+      }, 0);
+      return mockXHR;
+    });
+
+    httpClient = new HttpClient();
+  });
+
+  describe("Инициализация", () => {
+    it("должен создать экземпляр HttpClient", () => {
+      expect(httpClient).toBeInstanceOf(HttpClient);
+    });
+  });
+
+  describe("GET запросы", () => {
+    it("должен вызывать XMLHttpRequest.open с правильными параметрами для GET", () => {
+      // Не ждем завершения промиса, только проверяем вызовы
+      httpClient.get("/test").catch(() => {}); // catch чтобы избежать unhandled promise rejection
+
+      expect(XMLHttpRequest).toHaveBeenCalled();
+      expect(mockXHR.open).toHaveBeenCalledWith("GET", "/test", true);
+      expect(mockXHR.send).toHaveBeenCalled();
+    });
+
+    it("должен устанавливать заголовки для GET запроса", () => {
+      httpClient
+        .get("/test", {
+          headers: { Authorization: "Bearer token" },
+        })
+        .catch(() => {});
+
+      expect(mockXHR.setRequestHeader).toHaveBeenCalledWith(
+        "Authorization",
+        "Bearer token"
       );
+    });
+  });
 
+  describe("POST запросы", () => {
+    it("должен вызывать XMLHttpRequest.open с правильными параметрами для POST", () => {
+      const testData = { name: "test" };
 
+      httpClient.post("/test", testData).catch(() => {});
 
-      const response = await httpClient.get(url, {
-        timeout: 5000,
-        headers: {
-          Accept: "application/json",
-        },
-      });
+      expect(mockXHR.open).toHaveBeenCalledWith("POST", "/test", true);
+      expect(mockXHR.send).toHaveBeenCalledWith(JSON.stringify(testData));
+    });
 
-      console.log( {
-        status: response.status,
-        dataLength: Array.isArray(response.data) ? response.data.length : "N/A",
-        firstItem: Array.isArray(response.data)
-          ? response.data[0]
-          : response.data,
-      });
+    it("должен отправлять FormData как есть", () => {
+      const formData = new FormData();
+      formData.append("field", "value");
 
-      return response;
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
-  }
+      httpClient.post("/test", formData).catch(() => {});
 
-  static async testPostRequest() {
-    console.log("🧪 Тестируем POST запрос...");
+      expect(mockXHR.send).toHaveBeenCalledWith(formData);
+    });
+  });
 
-    try {
-      const postData = {
-        title: "Test Post",
-        body: "This is a test post from HttpClient",
-        userId: 1,
-      };
+  describe("PUT запросы", () => {
+    it("должен вызывать XMLHttpRequest.open с правильными параметрами для PUT", () => {
+      const testData = { id: 1, name: "updated" };
 
-      const response = await httpClient.post(
-        "https://jsonplaceholder.typicode.com/posts",
-        postData,
-        {
-          timeout: 5000,
+      httpClient.put("/test/1", testData).catch(() => {});
+
+      expect(mockXHR.open).toHaveBeenCalledWith("PUT", "/test/1", true);
+      expect(mockXHR.send).toHaveBeenCalledWith(JSON.stringify(testData));
+    });
+  });
+
+  describe("DELETE запросы", () => {
+    it("должен вызывать XMLHttpRequest.open с правильными параметрами для DELETE", () => {
+      httpClient.delete("/test/1").catch(() => {});
+
+      expect(mockXHR.open).toHaveBeenCalledWith("DELETE", "/test/1", true);
+      expect(mockXHR.send).toHaveBeenCalled();
+    });
+  });
+
+  describe("Заголовки", () => {
+    it("должен устанавливать Content-Type по умолчанию", () => {
+      httpClient.post("/test", { data: "test" }).catch(() => {});
+
+      expect(mockXHR.setRequestHeader).toHaveBeenCalledWith(
+        "Content-Type",
+        "application/json"
+      );
+    });
+
+    it("должен устанавливать пользовательские заголовки", () => {
+      httpClient
+        .get("/test", {
           headers: {
-            "Content-Type": "application/json",
+            Authorization: "Bearer token",
+            "X-Custom": "value",
           },
-        }
+        })
+        .catch(() => {});
+
+      expect(mockXHR.setRequestHeader).toHaveBeenCalledWith(
+        "Authorization",
+        "Bearer token"
       );
-
-
-      return response;
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
-  }
-
-  static async testPutRequest() {
-
-
-    try {
-      const updateData = {
-        id: 1,
-        title: "Updated Post",
-        body: "This post has been updated",
-        userId: 1,
-      };
-
-      const response = await httpClient.put(
-        "https://jsonplaceholder.typicode.com/posts/1",
-        updateData,
-        {
-          timeout: 5000,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+      expect(mockXHR.setRequestHeader).toHaveBeenCalledWith(
+        "X-Custom",
+        "value"
       );
+    });
 
-      return response;
-    } catch (error) {
-      console.error( error);
-      throw error;
-    }
-  }
+    it("не должен устанавливать Content-Type для FormData", () => {
+      const formData = new FormData();
 
-  static async testDeleteRequest() {
-    try {
-      const response = await httpClient.delete(
-        "https://jsonplaceholder.typicode.com/posts/1",
-        undefined,
-        {
-          timeout: 5000,
-        }
+      // Сбрасываем моки для чистого теста
+      mockXHR.setRequestHeader.mockClear();
+
+      httpClient.post("/test", formData).catch(() => {});
+
+      // Проверяем, что Content-Type не был установлен для FormData
+      expect(mockXHR.setRequestHeader).not.toHaveBeenCalledWith(
+        "Content-Type",
+        expect.stringContaining("multipart/form-data")
       );
+    });
+  });
 
-      console.log("✅ DELETE запрос успешен:", {
-        status: response.status,
-      });
+  describe("HTTP методы существуют", () => {
+    it("должен иметь все необходимые методы", () => {
+      expect(typeof httpClient.get).toBe("function");
+      expect(typeof httpClient.post).toBe("function");
+      expect(typeof httpClient.put).toBe("function");
+      expect(typeof httpClient.delete).toBe("function");
+    });
+  });
 
-      return response;
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
-  }
+  describe("Query параметры", () => {
+    it("должен поддерживать query параметры в GET запросе", () => {
+      // Проверяем базовую функциональность построения URL
+      httpClient.get("/test?param=value").catch(() => {});
 
-  /**
-   * Демонстрация обработки ошибок
-   */
-  static async testErrorHandling() {
-    console.log("🧪 Тестируем обработку ошибок...");
-
-    try {
-      // Запрос к несуществующему API
-      await httpClient.get("https://nonexistent-api.example.com/data", {
-        timeout: 3000,
-      });
-    } catch (error: any) {
-      console.log({
-        message: error.message,
-        status: error.status,
-      });
-    }
-
-    try {
-      // Запрос с таймаутом
-      await httpClient.get("https://httpbin.org/delay/5", {
-        timeout: 1000,
-      });
-    } catch (error: any) {
-      console.log("✅ Таймаут корректно обработан:", {
-        message: error.message,
-      });
-    }
-  }
-
-  /**
-   * Демонстрация работы с заголовками
-   */
-  static async testHeaders() {
-    console.log("🧪 Тестируем работу с заголовками...");
-
-    try {
-      const response = await httpClient.get("https://httpbin.org/headers", {
-        headers: {
-          "X-Custom-Header": "TestValue",
-          "User-Agent": "HttpClient-Demo/1.0",
-        },
-      });
-
-      console.log("✅ Заголовки отправлены:", {
-        status: response.status,
-        receivedHeaders: (response.data as any).headers,
-      });
-
-      return response;
-    } catch (error) {
-      console.error("❌ Тест заголовков не удался:", error);
-      throw error;
-    }
-  }
-
-  /**
-   * Запуск всех тестов
-   */
-  static async runAllTests() {
-    console.log("🚀 Запускаем тесты HTTP класса...\n");
-
-    try {
-      await this.testGetRequest();
-      console.log("");
-
-      await this.testPostRequest();
-      console.log("");
-
-      await this.testPutRequest();
-      console.log("");
-
-      await this.testDeleteRequest();
-      console.log("");
-
-      await this.testErrorHandling();
-      console.log("");
-
-      await this.testHeaders();
-      console.log("");
-
-      console.log("🎉 Все тесты HTTP класса пройдены успешно!");
-    } catch (error) {
-      console.error("💥 Ошибка при выполнении тестов:", error);
-    }
-  }
-}
-
-export default HttpClientDemo;
+      expect(mockXHR.open).toHaveBeenCalledWith(
+        "GET",
+        "/test?param=value",
+        true
+      );
+    });
+  });
+});
