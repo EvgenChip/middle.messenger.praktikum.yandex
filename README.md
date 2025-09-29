@@ -103,7 +103,7 @@ npm test
 - SPA роутинг
 - Оптимизация ресурсов
 
-**🌐 Демо:** [https://your-project.netlify.app](https://your-project.netlify.app)
+**🌐 Демо:** [https://effervescent-trifle-36f23b.netlify.app](https://effervescent-trifle-36f23b.netlify.app)
 
 ## 📝 Лицензия
 
