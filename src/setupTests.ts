@@ -62,10 +62,10 @@ class MockXMLHttpRequest {
       this.readyState = 4;
       this.status = 200;
       if (this.onreadystatechange) {
-        this.onreadystatechange();
+        (this.onreadystatechange as any)();
       }
       if (this.onload) {
-        this.onload();
+        (this.onload as any)();
       }
     }, 0);
   }
